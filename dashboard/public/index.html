@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FLORA — Field & Leaf Observation Robotic Assistant</title>
+  <link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/capture.css">
+</head>
+<body>
+  <aside>
+    <div class="brand"><span class="logo">F</span><div><b>FLORA</b><small>Field &amp; Leaf Observation<br>Robotic Assistant</small></div></div>
+    <nav><a class="active" href="#overview">Overview</a><a href="#monitoring">Live monitoring</a><a href="#analysis">Plant analysis</a><a href="#history">History & trends</a><a href="#devices">Device health</a></nav>
+    <div class="side-status"><span class="pulse"></span><div><small>SYSTEM STATUS</small><b id="systemState">Connecting</b></div></div>
+  </aside>
+  <main>
+    <header><div><p class="eyebrow">SMART PLANT MONITORING</p><h1>Plant overview</h1><p class="muted">Environmental intelligence and visual indications in one place.</p></div><div class="header-actions"><span id="clock"></span><button id="refresh">Refresh</button></div></header>
+
+    <section id="overview" class="hero">
+      <div><span class="label">OVERALL CONDITION</span><h2 id="condition">Waiting for telemetry</h2><p id="conditionDesc">Data will appear when the ESP32 publishes or demo mode starts.</p><div class="tags"><span id="priority" class="badge">LOW PRIORITY</span><span id="lastUpdate">No update</span></div></div>
+      <div class="hero-score"><span>Environmental risk</span><strong id="risk">—</strong><em id="confidence">—%</em></div>
+    </section>
+
+    <section id="monitoring"><div class="section-title"><div><p class="eyebrow">LIVE MONITORING</p><h2>Current environment</h2></div><span class="live"><i></i> LIVE FEED</span></div>
+      <div class="metric-grid">
+        <article class="metric"><span class="icon temp">°</span><div><small>TEMPERATURE</small><strong><span id="temperature">—</span><sup>°C</sup></strong><em id="temperatureStatus">—</em></div></article>
+        <article class="metric"><span class="icon humidity">◒</span><div><small>AIR HUMIDITY</small><strong><span id="humidity">—</span><sup>%</sup></strong><em id="humidityStatus">—</em></div></article>
+        <article class="metric"><span class="icon soil">⌁</span><div><small>SOIL MOISTURE</small><strong><span id="soil">—</span><sup>%</sup></strong><em id="soilStatus">—</em></div></article>
+      </div>
+    </section>
+
+    <div class="two-col" id="analysis">
+      <section class="panel"><div class="panel-head"><div><p class="eyebrow">AI VISION</p><h2>Visual indications</h2></div><span id="visionState" class="badge">OFFLINE</span></div>
+        <div id="visionBars" class="bars"></div><p class="notice">AI-detected patterns are indications only, not a confirmed disease diagnosis.</p>
+      </section>
+      <section class="panel watering"><div class="panel-head"><div><p class="eyebrow">SMART WATERING</p><h2 id="wateringStatus">Waiting</h2></div><span id="wateringPriority" class="badge">LOW</span></div>
+        <p id="wateringDesc" class="muted">Waiting for sufficient sensor history.</p><dl><div><dt>Dry since</dt><dd id="drySince">—</dd></div><div><dt>Dry duration</dt><dd id="dryDuration">0 min</dd></div><div><dt>Next check</dt><dd id="nextCheck">—</dd></div></dl><button id="watered">I watered this plant</button>
+      </section>
+    </div>
+
+    <section class="panel capture-panel" id="cameraCapture">
+      <div class="panel-head"><div><p class="eyebrow">ESP32-CAM CAPTURE</p><h2>Latest leaf capture</h2></div><span id="captureStatus" class="badge">WAITING FOR IMAGE</span></div>
+      <div class="capture-layout">
+        <div class="capture-frame"><img id="leafCapture" alt="Latest leaf captured by ESP32-CAM" hidden><div id="capturePlaceholder" class="capture-placeholder"><span class="leaf-mark">⌁</span><b>No image captured yet</b><p>Foto terbaru dari ESP32-CAM akan tampil di area ini.</p></div><span class="camera-label">ESP32-CAM · LIVE CAPTURE</span></div>
+        <div class="capture-info"><div><small>CAPTURE TIME</small><b id="captureTime">—</b></div><div><small>AI DETECTED PATTERN</small><b id="capturePrediction">Waiting</b></div><div><small>HIGHEST PROBABILITY</small><b id="captureProbability">—%</b></div><p>Gambar digunakan sebagai dukungan inspeksi visual. Hasil AI bukan diagnosis penyakit yang pasti.</p></div>
+      </div>
+    </section>
+
+    <section id="history" class="panel wide"><div class="panel-head"><div><p class="eyebrow">24-HOUR HISTORY</p><h2>Sensor trends</h2></div><div class="legend"><span class="l-temp">Temperature</span><span class="l-hum">Humidity</span><span class="l-soil">Soil</span></div></div><canvas id="chart"></canvas><div id="trendCards" class="trend-cards"></div></section>
+
+    <div class="two-col">
+      <section class="panel"><p class="eyebrow">RECOMMENDATION</p><h2>Recommended inspection</h2><p id="inspection" class="muted"></p><ul id="actions"></ul><details><summary>Possible factors</summary><ul id="factors"></ul></details></section>
+      <section class="panel"><p class="eyebrow">DAILY SUMMARY</p><h2>Today's signals</h2><div id="summary" class="summary-grid"></div></section>
+    </div>
+
+    <section id="devices" class="device-row"><article><span>ESP32 MAIN</span><b id="mainDevice">OFFLINE</b><small id="mainMac">—</small></article><article><span>ESP32-CAM</span><b id="camDevice">OFFLINE</b><small id="camMac">—</small></article><article><span>MQTT / EMQX</span><b id="mqttDevice">DISCONNECTED</b><small>Secure telemetry channel</small></article><article><span>WI-FI CHANNEL</span><b id="channel">—</b><small>ESP-NOW synchronized</small></article></section>
+    <footer>FLORA · Field &amp; Leaf Observation Robotic Assistant · Decision support, not automated diagnosis or treatment.</footer>
+  </main>
+  <div id="toast"></div><script src="/app.js"></script>
+</body></html>

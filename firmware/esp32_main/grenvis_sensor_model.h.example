@@ -1,0 +1,11 @@
+#pragma once
+
+// PLACEHOLDER DOKUMENTASI, BUKAN MODEL.
+// Salin header model TFLite asli ke `grenvis_sensor_model.h` dalam folder ini.
+// Header harus menyediakan simbol berikut (atau override macro di sketch):
+//
+// extern const unsigned char grenvis_sensor_model_tflite[];
+// extern const unsigned int grenvis_sensor_model_tflite_len;
+//
+// Model asli tidak disertakan karena byte model tidak tersedia di workspace dan
+// instruksi proyek melarang mengganti model sensor yang sudah bekerja.
