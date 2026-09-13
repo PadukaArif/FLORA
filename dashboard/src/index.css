@@ -2,17 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('/fonts/PlusJakartaSans-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('/fonts/PlusJakartaSans-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('/fonts/PlusJakartaSans-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('/fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --flora-primary-dark: #17483B;
-  --flora-primary: #2F6F5E;
-  --flora-botanical: #58977F;
-  --flora-light-accent: #8FBEA8;
-  --flora-mist: #DCECE5;
-  --flora-canvas: #F7FAF8;
+  --flora-primary-dark: #597C00;
+  --flora-primary: #658406;
+  --flora-accent: #9DB312;
+  --flora-canvas: #EFEFEE;
   --flora-surface: #FFFFFF;
-  --flora-ink: #17332B;
-  --flora-muted: #5C736B;
-  --flora-line: #E2EAE6;
 }
 
 * {
@@ -37,9 +64,372 @@ h1, h2, h3, h4, h5, h6, .font-display {
   font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
 }
 
-.font-tabular {
-  font-family: 'JetBrains Mono', monospace;
-  font-feature-settings: 'tnum' on, 'zero' on;
+.font-jakarta-bold {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+}
+
+.font-jakarta-semibold {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
+}
+
+.font-montserrat-regular {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+}
+
+.font-marck-script {
+  font-family: 'Marck Script', cursive;
+}
+
+/* Automated 3-color green animated gradient */
+@keyframes floraGreenShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.flora-gradient-text {
+  background: linear-gradient(135deg, #1E2805 0%, #597C00 28%, #9DB312 55%, #597C00 82%, #1E2805 100%);
+  background-size: 250% 250%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: floraGreenShift 6s ease-in-out infinite;
+}
+
+/* Realistic Ground/Floor Contact Shadows - BUKAN GLOW ABU-ABU */
+.floor-shadow-plant {
+  position: absolute;
+  bottom: 46px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  height: 36px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(20, 34, 4, 0.5) 0%,
+    rgba(24, 38, 5, 0.25) 40%,
+    rgba(30, 48, 8, 0.08) 65%,
+    transparent 80%
+  );
+  filter: blur(5px);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.floor-shadow-plant-core {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 16px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(15, 25, 3, 0.7) 0%,
+    rgba(20, 32, 5, 0.35) 50%,
+    transparent 75%
+  );
+  filter: blur(2px);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.floor-shadow-text {
+  position: absolute;
+  bottom: -14px;
+  left: 12px;
+  width: 420px;
+  max-width: 90%;
+  height: 20px;
+  background: radial-gradient(
+    ellipse at 40% 50%,
+    rgba(24, 38, 5, 0.42) 0%,
+    rgba(24, 38, 5, 0.2) 45%,
+    transparent 75%
+  );
+  filter: blur(5px);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: scaleY(0.45);
+}
+
+.text-floor-cast {
+  filter: drop-shadow(0 18px 12px rgba(25, 40, 5, 0.22)) drop-shadow(0 32px 24px rgba(35, 55, 10, 0.12));
+}
+
+/* Floating 3% Up & Down - Loop Selamanya */
+@keyframes floatThreePercent {
+  0%, 100% {
+    transform: translateY(0%);
+  }
+  50% {
+    transform: translateY(-3%);
+  }
+}
+
+.animate-float-3p-1 {
+  animation: floatThreePercent 3.6s ease-in-out infinite;
+}
+
+.animate-float-3p-2 {
+  animation: floatThreePercent 4.2s ease-in-out infinite 0.35s;
+}
+
+.animate-float-3p-3 {
+  animation: floatThreePercent 3.9s ease-in-out infinite 0.7s;
+}
+
+/* Nature-Inspired Organic Ambient Animations */
+@keyframes ambientOrganic1 {
+  0%, 100% {
+    transform: translate(0px, 0px) rotate(0deg) scale(1);
+  }
+  33% {
+    transform: translate(14px, -16px) rotate(2.2deg) scale(1.018);
+  }
+  66% {
+    transform: translate(-12px, 12px) rotate(-1.8deg) scale(0.985);
+  }
+}
+
+@keyframes ambientOrganic2 {
+  0%, 100% {
+    transform: translate(0px, 0px) rotate(0deg) scale(1);
+  }
+  33% {
+    transform: translate(-18px, 15px) rotate(-2.6deg) scale(0.982);
+  }
+  66% {
+    transform: translate(15px, -12px) rotate(2deg) scale(1.02);
+  }
+}
+
+@keyframes ambientOrganic3 {
+  0%, 100% {
+    transform: translate(0px, 0px) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate(10px, -20px) rotate(1.5deg) scale(1.015);
+  }
+}
+
+.animate-organic-1 {
+  animation: ambientOrganic1 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-organic-2 {
+  animation: ambientOrganic2 15s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-organic-3 {
+  animation: ambientOrganic3 20s ease-in-out infinite;
+  will-change: transform;
+}
+
+
+/* Animated Color Cycling for All Splash Screen Texts (3 Green Palettes) */
+@keyframes floraTextColorShift {
+  0% {
+    color: #1E2805;
+  }
+  33% {
+    color: #597C00;
+  }
+  66% {
+    color: #9DB312;
+  }
+  100% {
+    color: #1E2805;
+  }
+}
+
+.animate-text-flora-color {
+  animation: floraTextColorShift 5.5s ease-in-out infinite;
+}
+
+.animate-text-flora-color-delayed {
+  animation: floraTextColorShift 5.5s ease-in-out infinite 1.8s;
+}
+
+.flora-text-subtle-grad {
+  background: linear-gradient(135deg, #1E2805 0%, #597C00 50%, #9DB312 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: floraGreenShift 6s ease-in-out infinite;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 20px 48px -12px rgba(89, 124, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.glass-btn-shine {
+  position: relative;
+  overflow: hidden;
+  background: rgba(157, 179, 18, 0.16);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(89, 124, 0, 0.3);
+  box-shadow: 0 10px 30px -5px rgba(89, 124, 0, 0.14), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-btn-shine::after {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -70%;
+  width: 50%;
+  height: 220%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.75) 50%,
+    transparent 100%
+  );
+  transform: rotate(25deg);
+  transition: left 0.75s ease-in-out;
+  pointer-events: none;
+}
+
+.glass-btn-shine:hover::after {
+  left: 140%;
+}
+
+.glass-btn-shine:hover {
+  background: rgba(157, 179, 18, 0.28);
+  border-color: rgba(89, 124, 0, 0.55);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px -6px rgba(89, 124, 0, 0.22), inset 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+/* Character fade-up animation */
+@keyframes charUp {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-char-up {
+  display: inline-block;
+  animation: charUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Floating blurred geometric shapes */
+@keyframes floatGeo1 {
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+  50% { transform: translateY(-30px) rotate(35deg) scale(1.05); }
+}
+@keyframes floatGeo2 {
+  0%, 100% { transform: translateY(0) rotate(45deg) scale(1); }
+  50% { transform: translateY(35px) rotate(90deg) scale(0.95); }
+}
+.animate-float-geo-1 {
+  animation: floatGeo1 9s ease-in-out infinite;
+}
+.animate-float-geo-2 {
+  animation: floatGeo2 12s ease-in-out infinite;
+}
+
+/* Water droplets falling keyframe */
+@keyframes dropFall {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px) scaleY(0.7);
+  }
+  30% {
+    opacity: 0.95;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(220px) scaleY(1.4);
+  }
+}
+.animate-drop-fall {
+  animation: dropFall 0.9s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Spline watermark suppressor */
+#spline-watermark,
+a[href*="spline.design"],
+.spline-watermark,
+[class*="watermark"],
+[id*="watermark"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+@keyframes letterFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(48px) scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-24px) rotate(10deg);
+  }
+}
+
+@keyframes floatReverse {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(28px) rotate(-14deg);
+  }
+}
+
+@keyframes circleRevealAnim {
+  0% {
+    clip-path: circle(0% at 50% 50%);
+  }
+  100% {
+    clip-path: circle(150% at 50% 50%);
+  }
+}
+
+.animate-float-slow {
+  animation: floatSlow 8s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+  animation: floatReverse 10s ease-in-out infinite;
 }
 
 /* Card & Surface utilities */

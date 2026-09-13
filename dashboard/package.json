@@ -10,6 +10,8 @@
     "build": "tsc && vite build"
   },
   "dependencies": {
+    "@splinetool/react-spline": "^4.1.0",
+    "@splinetool/runtime": "^2.0.46",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "mqtt": "^5.14.1",
