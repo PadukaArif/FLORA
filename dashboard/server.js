@@ -19,6 +19,7 @@ const writeJson = (file, value) => fs.writeFileSync(file, JSON.stringify(value, 
 let history = readJson(historyFile).slice(-5000);
 let wateringEvents = readJson(wateringFile);
 let mqttState = 'DISCONNECTED';
+let mqttClient = null;
 let lastTelemetryAt = history.at(-1)?.timestamp || null;
 
 const cfg = {
@@ -161,7 +162,8 @@ function summary(rows) {
 }
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+const staticDir = fs.existsSync(path.join(__dirname, 'dist')) ? path.join(__dirname, 'dist') : path.join(__dirname, 'public');
+app.use(express.static(staticDir));
 app.get('/api/state', (req, res) => {
   const cutoff = Date.now() - 24 * 3600000;
   const daily = history.filter(r => Date.parse(r.timestamp) >= cutoff);
@@ -172,6 +174,33 @@ app.post('/api/watering', (req, res) => {
   const event = { id: Date.now(), timestamp: new Date().toISOString(), soil_before: latest?.soil_moisture ?? null, note: String(req.body.note || '').slice(0, 200) };
   wateringEvents.push(event); writeJson(wateringFile, wateringEvents); broadcast({type:'watering', data:event}); res.status(201).json(event);
 });
+app.post('/api/control', (req, res) => {
+  const { command } = req.body || {};
+  if (!command || !['L', 'R', 'S'].includes(command)) {
+    return res.status(400).json({ success: false, error: 'Invalid command. Allowed commands: L, R, S' });
+  }
+
+  const controlTopic = process.env.MQTT_CONTROL_TOPIC || 'grenvis/device/control';
+  const messages = {
+    'L': 'Left command sent',
+    'R': 'Right command sent',
+    'S': 'Stop command sent'
+  };
+  const message = messages[command];
+
+  if (mqttClient && mqttState === 'CONNECTED') {
+    mqttClient.publish(controlTopic, command, { qos: 1 }, (err) => {
+      if (err) {
+        console.error('MQTT publish command error:', err.message);
+        return res.status(500).json({ success: false, error: 'Failed to publish command to MQTT broker' });
+      }
+      res.json({ success: true, command, message });
+    });
+  } else {
+    console.log(`[Device Control] ${command} command processed (MQTT state: ${mqttState})`);
+    res.json({ success: true, command, message, mqtt: mqttState });
+  }
+});
 app.post('/api/demo', (req, res) => res.status(201).json(ingest(req.body)));
 
 const server = app.listen(port, () => console.log(`FLORA dashboard: http://localhost:${port}`));
@@ -180,12 +209,13 @@ function broadcast(message) { const text = JSON.stringify(message); for (const c
 
 const mqttUrl = process.env.MQTT_URL;
 if (mqttUrl) {
-  const client = mqtt.connect(mqttUrl, {
+  mqttClient = mqtt.connect(mqttUrl, {
     username: process.env.MQTT_USERNAME || undefined,
     password: process.env.MQTT_PASSWORD || undefined,
     rejectUnauthorized: String(process.env.MQTT_REJECT_UNAUTHORIZED || 'true') === 'true',
     reconnectPeriod: 5000
   });
+  const client = mqttClient;
   client.on('connect', () => { mqttState = 'CONNECTED'; client.subscribe([process.env.MQTT_TOPIC || 'grenvis/sensor/data', process.env.MQTT_STATUS_TOPIC || 'grenvis/sensor/status']); broadcast({type:'mqtt', data:mqttState}); });
   client.on('reconnect', () => { mqttState = 'RECONNECTING'; });
   client.on('offline', () => { mqttState = 'DISCONNECTED'; broadcast({type:'mqtt', data:mqttState}); });

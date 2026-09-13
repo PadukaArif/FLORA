@@ -6,6 +6,7 @@ firmware/**/grenvis_sensor_model.h
 *.map
 .pio/
 dashboard/node_modules/
+dashboard/dist/
 dashboard/.env
 dashboard/.env.*
 !dashboard/.env.example
