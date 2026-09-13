@@ -8,11 +8,17 @@ interface HeroOverviewProps {
 
 export const HeroOverview: React.FC<HeroOverviewProps> = ({ latest }) => {
   const conditionTitle = latest?.condition?.title || 'Menunggu Telemetri Sensor';
-  const conditionDesc = latest?.condition?.description || 'Data tanaman akan diperbarui secara otomatis saat ESP32 mempublikasikan telemetri.';
+  const conditionDesc =
+    latest?.condition?.description ||
+    'Data tanaman akan diperbarui secara otomatis saat ESP32 mempublikasikan telemetri lingkungan dan AI vision.';
   const priority = latest?.condition?.priority ? `${latest.condition.priority} Priority` : 'Normal Priority';
-  const lastUpdate = latest?.timestamp ? `Updated ${formatTime(latest.timestamp)}` : 'No data yet';
+  const lastUpdate = latest?.timestamp ? `Updated ${formatTime(latest.timestamp)}` : 'Awaiting data';
   const risk = latest?.sensor_risk ? String(latest.sensor_risk).toUpperCase() : 'UNKNOWN';
   const confidence = latest?.sensor_confidence !== undefined ? `${fmt(latest.sensor_confidence)}% confidence` : null;
+
+  const hasTemp = latest?.temperature !== undefined && latest?.temperature !== null;
+  const hasHum = latest?.humidity !== undefined && latest?.humidity !== null;
+  const hasSoil = latest?.soil_moisture !== undefined && latest?.soil_moisture !== null;
 
   const getRiskBadge = (r: string) => {
     switch (r) {
@@ -34,7 +40,7 @@ export const HeroOverview: React.FC<HeroOverviewProps> = ({ latest }) => {
       default:
         return {
           label: 'AWAITING DATA',
-          bg: 'bg-[#F2F6F4] text-[#5C736B] border-[#E2EAE6]',
+          bg: 'bg-[#10352B] text-[#8FBEA8] border-[#235849]',
         };
     }
   };
@@ -44,52 +50,95 @@ export const HeroOverview: React.FC<HeroOverviewProps> = ({ latest }) => {
   return (
     <section
       id="overview"
-      className="flora-card-hero p-6 lg:p-7 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
+      className="bg-[#17483B] border border-[#235849] p-6 lg:p-7 rounded-2xl text-white shadow-sm flex flex-col justify-between gap-6 transition-all"
     >
-      <div className="max-w-2xl">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-[#8FBEA8] px-2 py-0.5 rounded bg-[#10352B] border border-[#235849]">
-            Overall Plant Health Assessment
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-[#235849]/80">
+        <div>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#8FBEA8] block">
+            FLORA · Smart Plant &amp; AI System
           </span>
-          <span className="text-xs text-[#DCECE5]/80 font-tabular">{lastUpdate}</span>
+          <h2 className="text-xl lg:text-2xl font-bold font-display text-white tracking-tight mt-1">
+            Real-Time Environmental Monitoring &amp; AI Plant Analysis
+          </h2>
         </div>
 
-        <h2 className="text-2xl lg:text-3xl font-bold font-display text-white tracking-tight mt-1 mb-2">
-          {conditionTitle}
-        </h2>
-
-        <p className="text-sm text-[#DCECE5]/90 leading-relaxed max-w-xl">
-          {conditionDesc}
-        </p>
-
-        <div className="flex items-center gap-2 mt-4 flex-wrap">
-          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#10352B] text-[#DCECE5] border border-[#235849]">
-            {priority}
+        <div className="flex items-center gap-2 self-start md:self-auto shrink-0">
+          <span className="text-[11px] text-[#DCECE5]/80 font-tabular px-2.5 py-1 rounded-lg bg-[#10352B] border border-[#235849]">
+            {lastUpdate}
           </span>
-          <span className="text-xs text-[#8FBEA8] flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#8FBEA8]"></span>
-            Decision support model active
+          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-[#10352B] text-[#8FBEA8] border border-[#235849]">
+            {priority}
           </span>
         </div>
       </div>
 
-      {/* Environmental Risk Summary Box */}
-      <div className="bg-[#10352B]/90 border border-[#235849] rounded-xl p-5 min-w-[200px] text-center shrink-0 self-stretch md:self-auto flex flex-col items-center justify-center shadow-inner">
-        <span className="text-[10px] text-[#8FBEA8] uppercase tracking-wider font-semibold block mb-1">
-          Microclimate Risk
-        </span>
-        <div className={`px-3 py-1 rounded-lg text-sm font-bold border ${riskBadge.bg} my-1 font-display`}>
-          {riskBadge.label}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        {/* Plant Condition & Agronomic Insight */}
+        <div className="lg:col-span-2 space-y-2.5">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#4ADE80]" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#8FBEA8]">
+              Current Botanical Status
+            </span>
+          </div>
+
+          <h3 className="text-lg lg:text-xl font-bold font-display text-white">
+            {conditionTitle}
+          </h3>
+
+          <p className="text-xs lg:text-sm text-[#DCECE5]/90 leading-relaxed max-w-2xl">
+            {conditionDesc}
+          </p>
+
+          {/* Compact Live Telemetry Pills (Real Data Only) */}
+          <div className="flex items-center gap-2.5 pt-2 flex-wrap">
+            <div className="bg-[#10352B] border border-[#235849] px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs">
+              <span className="text-[#8FBEA8] text-[11px]">Temp</span>
+              <span className="font-bold font-tabular text-white">
+                {hasTemp ? `${fmt(latest!.temperature)}°C` : '—'}
+              </span>
+            </div>
+
+            <div className="bg-[#10352B] border border-[#235849] px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs">
+              <span className="text-[#8FBEA8] text-[11px]">Humidity</span>
+              <span className="font-bold font-tabular text-white">
+                {hasHum ? `${fmt(latest!.humidity)}%` : '—'}
+              </span>
+            </div>
+
+            <div className="bg-[#10352B] border border-[#235849] px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs">
+              <span className="text-[#8FBEA8] text-[11px]">Soil Moisture</span>
+              <span className="font-bold font-tabular text-white">
+                {hasSoil ? `${fmt(latest!.soil_moisture)}%` : '—'}
+              </span>
+            </div>
+
+            {latest?.vision_prediction && (
+              <div className="bg-[#10352B] border border-[#235849] px-3 py-1.5 rounded-xl flex items-center gap-2 text-xs">
+                <span className="text-[#8FBEA8] text-[11px]">AI Vision</span>
+                <span className="font-bold font-display text-white capitalize">
+                  {latest.vision_prediction}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
-        {confidence ? (
-          <span className="text-[11px] text-[#8FBEA8] font-tabular mt-1">
-            {confidence}
+
+        {/* Microclimate Risk Summary Panel */}
+        <div className="bg-[#10352B] border border-[#235849] rounded-xl p-4 flex flex-col items-center justify-center text-center">
+          <span className="text-[10px] text-[#8FBEA8] uppercase tracking-wider font-semibold block mb-1">
+            Microclimate Risk Index
           </span>
-        ) : (
-          <span className="text-[11px] text-[#8FBEA8]/70 mt-1">
-            Model inference
+          <div className={`px-3 py-1 rounded-lg text-xs font-bold border ${riskBadge.bg} my-1.5 font-display`}>
+            {riskBadge.label}
+          </div>
+          <span className="text-[11px] text-[#8FBEA8]/90 font-tabular mt-0.5">
+            {confidence || 'Edge AI Inference'}
           </span>
-        )}
+          <p className="text-[10px] text-[#8FBEA8]/70 mt-2 m-0 leading-tight">
+            Derived on-device via ESP32 microclimate classification.
+          </p>
+        </div>
       </div>
     </section>
   );

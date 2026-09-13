@@ -9,14 +9,92 @@ interface SidebarProps {
 }
 
 export const navItems = [
-  { id: 'overview', label: 'Overview', icon: '✦' },
-  { id: 'monitoring', label: 'Monitoring', icon: '◎' },
-  { id: 'analysis', label: 'AI Analysis', icon: '◈' },
-  { id: 'cameraCapture', label: 'AI Vision', icon: '◒' },
-  { id: 'device-control', label: 'Scanner Control', icon: '⇄' },
-  { id: 'treatment', label: 'Treatment & Advice', icon: '☘' },
-  { id: 'history', label: 'History & Trends', icon: '∿' },
-  { id: 'devices', label: 'System Health', icon: '▣' },
+  {
+    id: 'overview',
+    label: 'Overview',
+    icon: (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+      </svg>
+    ),
+  },
+  {
+    id: 'monitoring',
+    label: 'Monitoring',
+    icon: (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+      </svg>
+    ),
+  },
+  {
+    id: 'analysis',
+    label: 'AI Analysis',
+    icon: (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+    ),
+  },
+  {
+    id: 'cameraCapture',
+    label: 'AI Vision',
+    icon: (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="3" />
+        <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
+      </svg>
+    ),
+  },
+  {
+    id: 'device-control',
+    label: 'Scanner Control',
+    icon: (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="16 3 21 3 21 8" />
+        <line x1="4" y1="20" x2="21" y2="3" />
+        <polyline points="21 16 21 21 16 21" />
+        <line x1="15" y1="15" x2="21" y2="21" />
+        <line x1="4" y1="4" x2="9" y2="9" />
+      </svg>
+    ),
+  },
+  {
+    id: 'treatment',
+    label: 'Treatment & Advice',
+    icon: (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2a9 9 0 0 1 9 9c0 5-4 9-9 9s-9-4-9-9a9 9 0 0 1 9-9z" />
+        <path d="M12 6v12M8 10l4-4 4 4" />
+      </svg>
+    ),
+  },
+  {
+    id: 'history',
+    label: 'History & Trends',
+    icon: (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+    ),
+  },
+  {
+    id: 'devices',
+    label: 'System Health',
+    icon: (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
+        <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
+        <line x1="6" y1="6" x2="6.01" y2="6" />
+        <line x1="6" y1="18" x2="6.01" y2="18" />
+      </svg>
+    ),
+  },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -29,25 +107,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const isOnline = systemState.toLowerCase().includes('active') || systemState.toLowerCase().includes('ready');
 
   const navContent = (
-    <div className="flex flex-col h-full p-5 text-[#DCECE5]">
-      {/* Brand Header */}
-      <div className="flex items-center gap-3 pb-6 border-b border-[#235849]">
-        <div className="w-9 h-9 rounded-lg bg-[#2F6F5E] text-[#DCECE5] flex items-center justify-center font-bold text-lg border border-[#58977F]/30 shadow-sm">
+    <div className="flex flex-col h-full p-4 lg:p-5 text-[#DCECE5]">
+      {/* Brand Header - Quiet & Clean */}
+      <div className="flex items-center gap-3 pb-5 border-b border-[#235849]/80">
+        <div className="w-9 h-9 rounded-xl bg-[#2F6F5E] text-[#DCECE5] flex items-center justify-center font-bold text-base border border-[#58977F]/40 shadow-sm shrink-0">
           F
         </div>
-        <div>
-          <div className="font-bold text-base tracking-wide text-white font-display">
+        <div className="min-w-0">
+          <div className="font-bold text-[15px] tracking-wide text-white font-display leading-tight">
             FLORA
           </div>
-          <div className="text-[11px] text-[#8FBEA8] leading-tight font-medium">
+          <div className="text-[11px] text-[#8FBEA8] leading-tight font-medium mt-0.5 truncate">
             Smart Plant &amp; AI System
           </div>
         </div>
       </div>
 
       {/* Navigation List */}
-      <div className="my-5">
-        <p className="text-[10px] font-semibold text-[#8FBEA8]/80 uppercase tracking-wider px-3 mb-2">
+      <div className="my-5 flex-1 overflow-y-auto">
+        <p className="text-[10px] font-semibold text-[#8FBEA8]/70 uppercase tracking-wider px-3 mb-2.5">
           Navigation
         </p>
         <nav className="flex flex-col gap-1">
@@ -62,14 +140,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onNavigate(item.id);
                   onCloseMobile();
                 }}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 relative ${
                   isActive
                     ? 'bg-[#2F6F5E] text-white font-semibold shadow-sm'
-                    : 'text-[#8FBEA8] hover:bg-[#1E5647] hover:text-white'
+                    : 'text-[#8FBEA8] hover:bg-[#1C5142] hover:text-white'
                 }`}
               >
-                <span className="text-xs opacity-75">{item.icon}</span>
-                <span>{item.label}</span>
+                <span className={`shrink-0 transition-opacity ${isActive ? 'opacity-100 text-white' : 'opacity-70'}`}>
+                  {item.icon}
+                </span>
+                <span className="truncate">{item.label}</span>
+                {isActive && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#8FBEA8] ml-auto shrink-0" />
+                )}
               </a>
             );
           })}
@@ -77,18 +160,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* System Health Summary at Bottom */}
-      <div className="mt-auto pt-4 border-t border-[#235849]">
-        <div className="bg-[#10352B] p-3 rounded-xl border border-[#235849] flex items-center gap-3">
+      <div className="pt-4 border-t border-[#235849]/80 shrink-0">
+        <div className="bg-[#10352B] p-3 rounded-xl border border-[#235849] flex items-center gap-2.5">
           <span
-            className={`w-2.5 h-2.5 rounded-full shrink-0 ${
-              isOnline ? 'bg-[#4ADE80] shadow-[0_0_8px_rgba(74,222,128,0.5)]' : 'bg-[#FBBF24]'
+            className={`w-2 h-2 rounded-full shrink-0 ${
+              isOnline ? 'bg-[#4ADE80] shadow-[0_0_6px_rgba(74,222,128,0.5)]' : 'bg-[#FBBF24]'
             }`}
           />
           <div className="min-w-0 flex-1">
-            <span className="block text-[10px] text-[#8FBEA8] font-medium uppercase tracking-wider">
+            <span className="block text-[9px] text-[#8FBEA8] font-semibold uppercase tracking-wider">
               System Channel
             </span>
-            <span className="block text-xs font-semibold text-white truncate">
+            <span className="block text-xs font-semibold text-white truncate mt-0.5">
               {systemState}
             </span>
           </div>

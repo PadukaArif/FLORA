@@ -69,7 +69,7 @@ export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({ latest
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         {/* ESP32 Main Core */}
-        <article className="flora-card p-4">
+        <article className="flora-card p-4 rounded-2xl bg-white border border-[#E2EAE6] shadow-xs">
           <div className="flex justify-between items-center mb-1">
             <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider">
               ESP32 Main Node
@@ -89,7 +89,7 @@ export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({ latest
         </article>
 
         {/* ESP32-CAM Node */}
-        <article className="flora-card p-4">
+        <article className="flora-card p-4 rounded-2xl bg-white border border-[#E2EAE6] shadow-xs">
           <div className="flex justify-between items-center mb-1">
             <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider">
               ESP32-CAM Node
@@ -109,7 +109,7 @@ export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({ latest
         </article>
 
         {/* MQTT Broker Status */}
-        <article className="flora-card p-4">
+        <article className="flora-card p-4 rounded-2xl bg-white border border-[#E2EAE6] shadow-xs">
           <div className="flex justify-between items-center mb-1">
             <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider">
               MQTT Broker
@@ -129,7 +129,7 @@ export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({ latest
         </article>
 
         {/* WiFi / ESP-NOW Channel */}
-        <article className="flora-card p-4">
+        <article className="flora-card p-4 rounded-2xl bg-white border border-[#E2EAE6] shadow-xs">
           <div className="flex justify-between items-center mb-1">
             <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider">
               WiFi / ESP-NOW
@@ -149,7 +149,7 @@ export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({ latest
         </article>
 
         {/* DHT22 Sensor */}
-        <article className="flora-card p-4">
+        <article className="flora-card p-4 rounded-2xl bg-white border border-[#E2EAE6] shadow-xs">
           <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider block mb-1">
             DHT22 Temp/Humidity
           </span>
@@ -162,7 +162,7 @@ export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({ latest
         </article>
 
         {/* Soil Moisture ADC */}
-        <article className="flora-card p-4">
+        <article className="flora-card p-4 rounded-2xl bg-white border border-[#E2EAE6] shadow-xs">
           <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider block mb-1">
             Soil Moisture Probe
           </span>
@@ -175,7 +175,7 @@ export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({ latest
         </article>
 
         {/* L298N Motor Driver */}
-        <article className="flora-card p-4">
+        <article className="flora-card p-4 rounded-2xl bg-white border border-[#E2EAE6] shadow-xs">
           <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider block mb-1">
             L298N H-Bridge Driver
           </span>
@@ -188,7 +188,7 @@ export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({ latest
         </article>
 
         {/* Limit Switches */}
-        <article className="flora-card p-4">
+        <article className="flora-card p-4 rounded-2xl bg-white border border-[#E2EAE6] shadow-xs">
           <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider block mb-1">
             End-Stop Limit Switches
           </span>

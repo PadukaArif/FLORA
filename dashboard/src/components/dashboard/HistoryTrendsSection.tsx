@@ -21,7 +21,7 @@ export const HistoryTrendsSection: React.FC<HistoryTrendsSectionProps> = ({ hist
   // Filter history based on time range
   const getFilteredHistory = useCallback((): TelemetryRecord[] => {
     if (!history || history.length === 0) return [];
-    
+
     const now = Date.now();
     let cutoff = 0;
 
@@ -64,16 +64,16 @@ export const HistoryTrendsSection: React.FC<HistoryTrendsSectionProps> = ({ hist
     if (!c) return;
 
     c.scale(dpr, dpr);
-    const pLeft = 36;
-    const pRight = 16;
-    const pTop = 20;
-    const pBottom = 28;
+    const pLeft = 40;
+    const pRight = 20;
+    const pTop = 22;
+    const pBottom = 30;
     const chartW = w - pLeft - pRight;
     const chartH = h - pTop - pBottom;
 
     c.clearRect(0, 0, w, h);
 
-    // Draw horizontal grid lines & Y-axis labels
+    // Draw horizontal grid lines & Y-axis scale
     c.strokeStyle = '#EEF3F0';
     c.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
@@ -83,10 +83,10 @@ export const HistoryTrendsSection: React.FC<HistoryTrendsSectionProps> = ({ hist
       c.lineTo(w - pRight, y);
       c.stroke();
 
-      c.fillStyle = '#5C736B';
+      c.fillStyle = '#7A9289';
       c.font = '10px "JetBrains Mono", monospace';
       c.textAlign = 'right';
-      c.fillText(`${100 - i * 25}%`, pLeft - 6, y + 3);
+      c.fillText(`${100 - i * 25}`, pLeft - 8, y + 3.5);
     }
 
     if (!activeData || activeData.length === 0) {
@@ -97,7 +97,7 @@ export const HistoryTrendsSection: React.FC<HistoryTrendsSectionProps> = ({ hist
       return;
     }
 
-    // Series Definitions
+    // Series Definitions with specific units
     const series: Array<{ field: keyof TelemetryRecord; color: string }> = [
       { field: 'temperature', color: '#D97706' },
       { field: 'humidity', color: '#0284C7' },
@@ -107,7 +107,9 @@ export const HistoryTrendsSection: React.FC<HistoryTrendsSectionProps> = ({ hist
     series.forEach(({ field, color }) => {
       c.beginPath();
       c.strokeStyle = color;
-      c.lineWidth = 2;
+      c.lineWidth = 2.2;
+      c.lineCap = 'round';
+      c.lineJoin = 'round';
 
       activeData.forEach((r, i) => {
         const val = Number(r[field]);
@@ -125,9 +127,9 @@ export const HistoryTrendsSection: React.FC<HistoryTrendsSectionProps> = ({ hist
       c.stroke();
     });
 
-    // Draw X-axis timestamps (First, Middle, Last)
+    // Draw X-axis timestamps (Start, Mid, End)
     if (activeData.length >= 2) {
-      c.fillStyle = '#5C736B';
+      c.fillStyle = '#7A9289';
       c.font = '10px "JetBrains Mono", monospace';
       c.textAlign = 'left';
       c.fillText(formatTime(activeData[0].timestamp), pLeft, h - 8);
@@ -170,8 +172,8 @@ export const HistoryTrendsSection: React.FC<HistoryTrendsSectionProps> = ({ hist
 
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
-    const pLeft = 36;
-    const pRight = 16;
+    const pLeft = 40;
+    const pRight = 20;
     const chartW = rect.width - pLeft - pRight;
 
     const relativeX = Math.max(0, Math.min(chartW, x - pLeft));
@@ -210,43 +212,45 @@ export const HistoryTrendsSection: React.FC<HistoryTrendsSectionProps> = ({ hist
   ];
 
   return (
-    <section id="history" className="flora-card p-6 mt-8">
+    <section id="history" className="flora-card p-6 mt-8 rounded-2xl bg-white border border-[#E2EAE6] shadow-sm">
       {/* Header & Range Controls */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
         <div>
-          <span className="text-[11px] font-semibold text-[#2F6F5E] uppercase tracking-wider block">
+          <span className="text-[10px] font-bold text-[#2F6F5E] uppercase tracking-widest block">
             Environmental History
           </span>
-          <h2 className="text-lg font-bold text-[#17332B] font-display">
+          <h2 className="text-lg font-bold text-[#17332B] font-display mt-0.5">
             Multi-Sensor Historical Trends
           </h2>
         </div>
 
         {/* Legend and Time Range Selector */}
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-3 text-xs font-medium text-[#17332B] bg-[#F2F6F4] px-3 py-1.5 rounded-lg border border-[#E2EAE6]">
+          {/* Explicit Unit Legend */}
+          <div className="flex items-center gap-3 text-xs font-semibold text-[#17332B] bg-[#F2F6F4] px-3 py-1.5 rounded-xl border border-[#E2EAE6]">
             <span className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-[#D97706]" />
-              Temp
+              <span>Temp (°C)</span>
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-[#0284C7]" />
-              Humidity
+              <span>Humidity (%)</span>
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-[#2F6F5E]" />
-              Soil
+              <span>Soil Moisture (%)</span>
             </span>
           </div>
 
-          <div className="flex rounded-lg bg-[#F2F6F4] p-0.5 border border-[#E2EAE6] text-xs font-semibold">
+          {/* Time Range Selector */}
+          <div className="flex rounded-xl bg-[#F2F6F4] p-1 border border-[#E2EAE6] text-xs font-semibold">
             {(['LIVE', '1H', '6H', '24H'] as TimeRange[]).map((range) => (
               <button
                 key={range}
                 onClick={() => setSelectedRange(range)}
-                className={`px-2.5 py-1 rounded-md transition-all ${
+                className={`px-3 py-1 rounded-lg transition-all text-xs ${
                   selectedRange === range
-                    ? 'bg-white text-[#17483B] shadow-sm font-bold'
+                    ? 'bg-white text-[#17483B] shadow-xs font-bold'
                     : 'text-[#5C736B] hover:text-[#17332B]'
                 }`}
               >
@@ -266,32 +270,42 @@ export const HistoryTrendsSection: React.FC<HistoryTrendsSectionProps> = ({ hist
           className="w-full h-[260px] block cursor-crosshair"
         />
 
-        {/* Floating Tooltip */}
+        {/* Floating Dark Botanical Tooltip */}
         {hoveredPoint && (
           <div
-            className="absolute z-20 pointer-events-none bg-[#17483B] text-white p-3 rounded-xl shadow-xl text-xs border border-[#235849] -translate-x-1/2 -translate-y-full mb-2 min-w-[170px]"
-            style={{ left: hoveredPoint.x, top: Math.max(60, hoveredPoint.y) }}
+            className="absolute z-20 pointer-events-none bg-[#17483B] text-white p-3.5 rounded-xl shadow-xl text-xs border border-[#235849] -translate-x-1/2 -translate-y-full mb-2 min-w-[185px] backdrop-blur-sm"
+            style={{ left: hoveredPoint.x, top: Math.max(65, hoveredPoint.y) }}
           >
-            <div className="text-[10px] text-[#8FBEA8] font-tabular border-b border-[#235849] pb-1 mb-1.5">
-              {formatTime(hoveredPoint.record.timestamp)}
+            <div className="text-[10px] font-semibold text-[#8FBEA8] font-tabular border-b border-[#235849] pb-1.5 mb-2 flex items-center justify-between">
+              <span>Timestamp</span>
+              <span>{formatTime(hoveredPoint.record.timestamp)}</span>
             </div>
-            <div className="space-y-1 font-tabular">
-              <div className="flex justify-between">
-                <span className="text-[#DCECE5]">Temp:</span>
+            <div className="space-y-1.5 font-tabular">
+              <div className="flex justify-between items-center">
+                <span className="text-[#DCECE5] flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#D97706]" />
+                  Temperature:
+                </span>
                 <span className="font-bold text-[#FDE68A]">
-                  {fmt(hoveredPoint.record.temperature)}°C
+                  {fmt(hoveredPoint.record.temperature)} °C
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-[#DCECE5]">Humidity:</span>
+              <div className="flex justify-between items-center">
+                <span className="text-[#DCECE5] flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#0284C7]" />
+                  Air Humidity:
+                </span>
                 <span className="font-bold text-[#BAE6FD]">
-                  {fmt(hoveredPoint.record.humidity)}%
+                  {fmt(hoveredPoint.record.humidity)} %
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-[#DCECE5]">Soil:</span>
+              <div className="flex justify-between items-center">
+                <span className="text-[#DCECE5] flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#2F6F5E]" />
+                  Soil Moisture:
+                </span>
                 <span className="font-bold text-[#86EFAC]">
-                  {fmt(hoveredPoint.record.soil_moisture)}%
+                  {fmt(hoveredPoint.record.soil_moisture)} %
                 </span>
               </div>
             </div>
@@ -300,13 +314,13 @@ export const HistoryTrendsSection: React.FC<HistoryTrendsSectionProps> = ({ hist
       </div>
 
       {/* Trend Momentum Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-4 pt-3 border-t border-[#E2EAE6]">
         {trendCards.map((item) => (
           <div key={item.label} className="bg-[#F2F6F4] border border-[#E2EAE6] p-3.5 rounded-xl">
-            <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider block">
+            <span className="text-[10px] font-bold text-[#5C736B] uppercase tracking-wider block">
               {item.label}
             </span>
-            <span className={`text-sm font-bold font-display capitalize block mt-0.5 ${item.statusColor}`}>
+            <span className={`text-sm font-bold font-display capitalize block mt-1 ${item.statusColor}`}>
               {item.value}
             </span>
           </div>

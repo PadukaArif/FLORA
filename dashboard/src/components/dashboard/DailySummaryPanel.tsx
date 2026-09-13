@@ -29,7 +29,7 @@ export const DailySummaryPanel: React.FC<DailySummaryPanelProps> = ({ summary })
   ];
 
   return (
-    <section className="flora-card p-6">
+    <section className="flora-card p-6 rounded-2xl bg-white border border-[#E2EAE6] shadow-sm">
       <div className="flex justify-between items-start mb-4">
         <div>
           <span className="text-[11px] font-semibold text-[#2F6F5E] uppercase tracking-wider block">

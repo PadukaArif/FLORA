@@ -75,7 +75,7 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
   const rightInfo = getLimitLabel(limitRight);
 
   return (
-    <section id="device-control" className="flora-card p-6 mt-8">
+    <section id="device-control" className="flora-card p-6 mt-8 rounded-2xl bg-white border border-[#E2EAE6] shadow-sm">
       <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
         <div>
           <span className="text-[11px] font-semibold text-[#2F6F5E] uppercase tracking-wider block">

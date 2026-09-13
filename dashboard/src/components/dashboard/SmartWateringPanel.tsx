@@ -42,7 +42,7 @@ export const SmartWateringPanel: React.FC<SmartWateringPanelProps> = ({ latest, 
   };
 
   return (
-    <section className="flora-card p-6 flex flex-col justify-between">
+    <section className="flora-card p-6 flex flex-col justify-between rounded-2xl bg-white border border-[#E2EAE6] shadow-sm">
       <div>
         {/* Header */}
         <div className="flex justify-between items-start mb-3">
