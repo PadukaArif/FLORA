@@ -36,11 +36,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           F
         </div>
         <div>
-          <div className="font-bold text-base tracking-wide text-white font-display flex items-center gap-1.5">
+          <div className="font-bold text-base tracking-wide text-white font-display">
             FLORA
-            <span className="text-[10px] font-normal px-1.5 py-0.5 rounded bg-[#2F6F5E]/60 text-[#8FBEA8] border border-[#58977F]/20">
-              v2.0
-            </span>
           </div>
           <div className="text-[11px] text-[#8FBEA8] leading-tight font-medium">
             Smart Plant &amp; AI System

@@ -15,19 +15,35 @@ export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({ latest
   const mainMac = latest?.esp32_mac || '—';
 
   const isVisionActive = isOnline && Boolean(latest?.vision_connected);
-  const camStatus = isVisionActive ? 'ONLINE (ESP-NOW)' : 'STANDBY / OFFLINE';
+  const camStatus = isVisionActive ? 'ESP-NOW ACTIVE' : 'STANDBY / NO SIGNAL';
   const camMac = latest?.esp32cam_mac || '—';
 
   const mqtt = mqttStatus || 'DISCONNECTED';
-  const wifiChannel = latest?.wifi_channel !== undefined ? `CH ${latest.wifi_channel}` : '—';
+  const hasWifiChannel = latest?.wifi_channel !== undefined && latest.wifi_channel !== null;
+  const wifiChannelText = hasWifiChannel ? `CH ${latest!.wifi_channel}` : '—';
 
-  const dhtStatus = isOnline ? 'OPERATIONAL' : 'STANDBY';
-  const soilStatus = isOnline ? 'OPERATIONAL' : 'STANDBY';
-  const l298nStatus = mqtt === 'CONNECTED' ? 'PIPE READY' : 'OFFLINE';
+  const dhtStatus = isOnline ? 'STREAMING' : 'NO STREAM';
+  const soilStatus = isOnline ? 'STREAMING' : 'NO STREAM';
+  const l298nStatus = 'NOT REPORTED';
 
-  const leftLimit = Boolean(latest?.limit_left);
-  const rightLimit = Boolean(latest?.limit_right);
-  const limitSummary = leftLimit || rightLimit ? 'LIMIT ENGAGED' : 'CLEAR';
+  const hasLeftLimit = latest?.limit_left !== undefined && latest?.limit_left !== null;
+  const hasRightLimit = latest?.limit_right !== undefined && latest?.limit_right !== null;
+  const leftText = latest?.limit_left === true ? 'ACTIVE' : latest?.limit_left === false ? 'CLEAR' : 'UNKNOWN';
+  const rightText = latest?.limit_right === true ? 'ACTIVE' : latest?.limit_right === false ? 'CLEAR' : 'UNKNOWN';
+
+  const limitSummary =
+    latest?.limit_left === true || latest?.limit_right === true
+      ? 'LIMIT ACTIVE'
+      : !hasLeftLimit && !hasRightLimit
+      ? 'NOT REPORTED'
+      : 'CLEAR';
+
+  const limitColor =
+    limitSummary === 'LIMIT ACTIVE'
+      ? 'text-[#DC2626]'
+      : limitSummary === 'CLEAR'
+      ? 'text-[#2E7D32]'
+      : 'text-[#5C736B]';
 
   return (
     <section id="devices" className="mt-8">
@@ -47,7 +63,7 @@ export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({ latest
               : 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]'
           }`}
         >
-          {isOnline && mqtt === 'CONNECTED' ? 'Mesh Sync Healthy' : 'Degraded Sync'}
+          {isOnline && mqtt === 'CONNECTED' ? 'Telemetry Stream Active' : 'Degraded Telemetry'}
         </span>
       </div>
 
@@ -92,11 +108,11 @@ export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({ latest
           </span>
         </article>
 
-        {/* MQTT TLS Pipeline */}
+        {/* MQTT Broker Status */}
         <article className="flora-card p-4">
           <div className="flex justify-between items-center mb-1">
             <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider">
-              MQTT Broker (TLS)
+              MQTT Broker
             </span>
             <span
               className={`w-2 h-2 rounded-full ${
@@ -108,23 +124,27 @@ export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({ latest
             {mqtt}
           </span>
           <span className="text-[11px] text-[#5C736B] block mt-1">
-            EMQX Cloud TLS Port 8883
+            Broker Transport Pipeline
           </span>
         </article>
 
-        {/* WiFi & ESP-NOW Channel */}
+        {/* WiFi / ESP-NOW Channel */}
         <article className="flora-card p-4">
           <div className="flex justify-between items-center mb-1">
             <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider">
               WiFi / ESP-NOW
             </span>
-            <span className="w-2 h-2 rounded-full bg-[#2E7D32]" />
+            <span
+              className={`w-2 h-2 rounded-full ${
+                hasWifiChannel ? 'bg-[#2E7D32]' : 'bg-[#5C736B]'
+              }`}
+            />
           </div>
           <span className="text-sm font-bold text-[#17332B] block font-display font-tabular">
-            Channel {wifiChannel}
+            Channel: {wifiChannelText}
           </span>
           <span className="text-[11px] text-[#5C736B] block mt-1">
-            Peer Mesh Active
+            {hasWifiChannel ? 'Reported via ESP32 telemetry' : 'Awaiting telemetry'}
           </span>
         </article>
 
@@ -137,7 +157,7 @@ export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({ latest
             {dhtStatus}
           </span>
           <span className="text-[11px] text-[#5C736B] block mt-1">
-            GPIO 4 Single-Bus
+            GPIO 4 Sensor Bus
           </span>
         </article>
 
@@ -159,11 +179,11 @@ export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({ latest
           <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider block mb-1">
             L298N H-Bridge Driver
           </span>
-          <span className="text-sm font-bold text-[#17332B] block font-display">
+          <span className="text-sm font-bold text-[#5C736B] block font-display">
             {l298nStatus}
           </span>
           <span className="text-[11px] text-[#5C736B] block mt-1">
-            DC Linear Actuator
+            No hardware telemetry line
           </span>
         </article>
 
@@ -173,14 +193,12 @@ export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({ latest
             End-Stop Limit Switches
           </span>
           <span
-            className={`text-sm font-bold font-display block ${
-              leftLimit || rightLimit ? 'text-[#DC2626]' : 'text-[#2E7D32]'
-            }`}
+            className={`text-sm font-bold font-display block ${limitColor}`}
           >
             {limitSummary}
           </span>
           <span className="text-[11px] font-tabular text-[#5C736B] block mt-1">
-            L: {leftLimit ? 'HIT' : 'OK'} | R: {rightLimit ? 'HIT' : 'OK'}
+            L: {leftText} | R: {rightText}
           </span>
         </article>
       </div>

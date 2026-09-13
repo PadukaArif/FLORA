@@ -37,7 +37,7 @@ export const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const { message, visible, showToast } = useToast();
   const { data, systemState, refresh, recordWatering } = useDashboard(showToast);
-  const activeSection = useScrollSpy(sectionIds, 120);
+  const activeSection = useScrollSpy(sectionIds, 140);
   const { relativeText, isStale } = useRelativeTime(data?.latest?.timestamp);
 
   const handleNavigate = (sectionId: string) => {
@@ -89,16 +89,16 @@ export const App: React.FC = () => {
             />
 
             <div className="space-y-8">
-              {/* Overview */}
+              {/* 1. Overview */}
               <HeroOverview latest={data?.latest || null} />
 
-              {/* Live Telemetry with Interpretation */}
+              {/* 2. Live Telemetry with Interpretation */}
               <LiveMonitoring
                 latest={data?.latest || null}
                 config={data?.config}
               />
 
-              {/* Plant Intelligence (Environmental AI + AI Vision) */}
+              {/* 3. Plant Intelligence (Environmental AI + AI Vision) */}
               <div
                 className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch"
                 id="analysis"
@@ -107,7 +107,17 @@ export const App: React.FC = () => {
                 <AiVisionPanel latest={data?.latest || null} />
               </div>
 
-              {/* Treatment Advisory + Smart Watering */}
+              {/* 4. ESP32-CAM AI Vision Optical Capture */}
+              <CameraCapturePanel latest={data?.latest || null} />
+
+              {/* 5. Manual Scanner Carriage Control */}
+              <ManualDeviceControl
+                onToast={showToast}
+                limitLeft={data?.latest?.limit_left}
+                limitRight={data?.latest?.limit_right}
+              />
+
+              {/* 6. Treatment Advisory + Smart Watering */}
               <div
                 className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch"
                 id="treatment"
@@ -119,17 +129,7 @@ export const App: React.FC = () => {
                 />
               </div>
 
-              {/* ESP32-CAM AI Vision Optical Capture */}
-              <CameraCapturePanel latest={data?.latest || null} />
-
-              {/* Manual Scanner Carriage Control */}
-              <ManualDeviceControl
-                onToast={showToast}
-                limitLeft={data?.latest?.limit_left}
-                limitRight={data?.latest?.limit_right}
-              />
-
-              {/* Environmental Trends & Multi-Sensor Chart */}
+              {/* 7. Environmental Trends & Multi-Sensor Chart */}
               <HistoryTrendsSection
                 history={data?.history || []}
                 trends={data?.summary?.trends}

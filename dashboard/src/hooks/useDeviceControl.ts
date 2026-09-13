@@ -4,8 +4,8 @@ import { sendDeviceCommand } from '../services/api';
 
 interface UseDeviceControlOptions {
   onToast?: (message: string) => void;
-  limitLeft?: boolean;
-  limitRight?: boolean;
+  limitLeft?: boolean | null;
+  limitRight?: boolean | null;
 }
 
 export interface UseDeviceControlReturn {
@@ -20,16 +20,17 @@ export interface UseDeviceControlReturn {
 
 export function useDeviceControl({
   onToast,
-  limitLeft = false,
-  limitRight = false,
+  limitLeft,
+  limitRight,
 }: UseDeviceControlOptions = {}): UseDeviceControlReturn {
   const [movementStatus, setMovementStatus] = useState<DeviceMovementStatus>('idle');
   const [isSending, setIsSending] = useState<boolean>(false);
   const [lastCommand, setLastCommand] = useState<DeviceCommand | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const isLeftBlocked = Boolean(limitLeft);
-  const isRightBlocked = Boolean(limitRight);
+  // Strictly block only if explicitly confirmed active (true)
+  const isLeftBlocked = limitLeft === true;
+  const isRightBlocked = limitRight === true;
 
   const sendCommand = useCallback(
     async (command: DeviceCommand) => {
@@ -57,17 +58,17 @@ export function useDeviceControl({
         const result = await sendDeviceCommand(command);
 
         if (command === 'L') {
-          setMovementStatus('moving_left');
+          setMovementStatus('left_command_sent');
         } else if (command === 'R') {
-          setMovementStatus('moving_right');
+          setMovementStatus('right_command_sent');
         } else if (command === 'S') {
-          setMovementStatus('stopped');
+          setMovementStatus('stop_command_sent');
         }
 
         setLastCommand(command);
 
         if (onToast) {
-          onToast(result.message || `Command ${command} sent successfully`);
+          onToast(result.message || `Command ${command} dispatched to broker`);
         }
       } catch (err: any) {
         const errorMsg = err?.message || 'Failed to send device command';
