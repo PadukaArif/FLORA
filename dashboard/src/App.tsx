@@ -33,7 +33,7 @@ const sectionIds = [
 ];
 
 export const App: React.FC = () => {
-  const [expStage, setExpStage] = useState<'boot' | 'plant' | 'dashboard'>('dashboard');
+  const [expStage, setExpStage] = useState<'boot' | 'plant' | 'dashboard'>('boot');
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const { message, visible, showToast } = useToast();
   const { data, systemState, refresh, recordWatering } = useDashboard(showToast);
@@ -49,10 +49,10 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#F7FAF8] text-[#17332B] flex flex-col">
-      {/* 1. Splash Screen Boot Sequence */}
+      {/* 1. Splash Screen Boot Sequence - Fixed overlay, unmounted and deleted forever when finished */}
       {expStage === 'boot' && (
         <SplashScreen
-          onBootComplete={() => setExpStage('plant')}
+          onBootComplete={() => setExpStage('dashboard')}
           onSkip={() => setExpStage('dashboard')}
         />
       )}
@@ -65,8 +65,8 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* 3. FLORA Main Dashboard */}
-      {expStage === 'dashboard' && (
+      {/* 3. FLORA Main Dashboard - Rendered underneath so circle outro seamlessly reveals it */}
+      {expStage !== 'plant' && (
         <div className="flex flex-1 min-h-screen">
           {/* Refined Sidebar */}
           <Sidebar
