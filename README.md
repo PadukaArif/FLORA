@@ -1,6 +1,6 @@
-# GRENVIS Smart Plant Monitoring System
+# FLORA Smart Plant Monitoring System
 
-GRENVIS adalah prototype pemantauan tanaman yang menggabungkan ESP32, ESP32-CAM, sensor lingkungan, AI, ESP-NOW, MQTT, dan dashboard web.
+FLORA adalah prototype pemantauan tanaman yang menggabungkan ESP32, ESP32-CAM, sensor lingkungan, AI, ESP-NOW, MQTT, dan dashboard web.
 
 ## Struktur project
 
