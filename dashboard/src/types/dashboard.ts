@@ -30,8 +30,8 @@ export interface TelemetryRecord {
   esp32cam_mac?: string;
   wifi_channel?: number;
   uptime_seconds?: number;
-  limit_left?: boolean;
-  limit_right?: boolean;
+  limit_left?: boolean | null;
+  limit_right?: boolean | null;
   temperature_status: 'HIGH' | 'NORMAL' | string;
   humidity_status: 'HIGH' | 'LOW' | 'NORMAL' | string;
   soil_status: 'DRY' | 'WET' | 'NORMAL' | string;
@@ -134,9 +134,9 @@ export type DeviceCommand = 'L' | 'R' | 'S';
 
 export type DeviceMovementStatus =
   | 'idle'
-  | 'moving_left'
-  | 'moving_right'
-  | 'stopped'
+  | 'left_command_sent'
+  | 'right_command_sent'
+  | 'stop_command_sent'
   | 'sending'
   | 'error';
 
@@ -147,11 +147,3 @@ export interface DeviceControlResponse {
   error?: string;
   mqtt?: string;
 }
-
-export type ExperienceStage =
-  | 'boot'
-  | 'plant'
-  | 'sensors'
-  | 'ai_scan'
-  | 'system_online'
-  | 'complete';

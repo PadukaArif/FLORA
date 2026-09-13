@@ -24,7 +24,7 @@ export const RecommendationPanel: React.FC<RecommendationPanelProps> = ({ latest
   };
 
   return (
-    <section id="treatment" className="flora-card p-6 flex flex-col justify-between">
+    <section className="flora-card p-6 flex flex-col justify-between">
       <div>
         {/* Header */}
         <div className="flex justify-between items-start mb-3">

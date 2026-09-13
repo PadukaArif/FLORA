@@ -3,7 +3,6 @@ import { useClock } from '../../hooks/useClock';
 
 interface HeaderProps {
   onRefresh: () => void;
-  onReplayIntro?: () => void;
   onOpenMobileMenu?: () => void;
   isRefreshing?: boolean;
   mqttStatus?: string;
@@ -13,7 +12,6 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   onRefresh,
-  onReplayIntro,
   onOpenMobileMenu,
   isRefreshing,
   mqttStatus = 'DISCONNECTED',
@@ -80,17 +78,6 @@ export const Header: React.FC<HeaderProps> = ({
         <span className="hidden md:inline-block px-3 py-1.5 rounded-lg bg-white border border-[#E2EAE6] text-xs font-medium text-[#17332B] font-tabular shadow-sm">
           {clock}
         </span>
-
-        {/* Intro Replay (if provided) */}
-        {onReplayIntro && (
-          <button
-            onClick={onReplayIntro}
-            className="px-3 py-1.5 rounded-lg bg-white hover:bg-[#F2F6F4] border border-[#E2EAE6] text-xs font-semibold text-[#2F6F5E] transition-all shadow-sm"
-            title="Replay 3D Intro Experience"
-          >
-            Intro
-          </button>
-        )}
 
         {/* Refresh Button */}
         <button

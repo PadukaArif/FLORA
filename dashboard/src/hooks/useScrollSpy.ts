@@ -1,27 +1,37 @@
 import { useState, useEffect } from 'react';
 
-export function useScrollSpy(sectionIds: string[], offset: number = 100): string {
+export function useScrollSpy(sectionIds: string[], offset: number = 140): string {
   const [activeId, setActiveId] = useState<string>(sectionIds[0] || '');
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + offset;
+      // If scrolled near the top of the page, activate the first section
+      if (window.scrollY < 80 && sectionIds.length > 0) {
+        setActiveId(sectionIds[0]);
+        return;
+      }
 
-      for (let i = sectionIds.length - 1; i >= 0; i--) {
-        const id = sectionIds[i];
+      // If scrolled to the bottom of the page, activate the last section
+      const isBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 60;
+      if (isBottom && sectionIds.length > 0) {
+        setActiveId(sectionIds[sectionIds.length - 1]);
+        return;
+      }
+
+      let currentSection = sectionIds[0] || '';
+
+      for (const id of sectionIds) {
         const element = document.getElementById(id);
         if (element) {
-          const top = element.offsetTop;
-          if (scrollPosition >= top) {
-            setActiveId(id);
-            return;
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= offset) {
+            currentSection = id;
           }
         }
       }
 
-      if (sectionIds.length > 0) {
-        setActiveId(sectionIds[0]);
-      }
+      setActiveId(currentSection);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });

@@ -4,14 +4,14 @@ import { DeviceMovementStatus } from '../../types/dashboard';
 
 interface ManualDeviceControlProps {
   onToast?: (message: string) => void;
-  limitLeft?: boolean;
-  limitRight?: boolean;
+  limitLeft?: boolean | null;
+  limitRight?: boolean | null;
 }
 
 export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
   onToast,
-  limitLeft = false,
-  limitRight = false,
+  limitLeft,
+  limitRight,
 }) => {
   const {
     movementStatus,
@@ -24,21 +24,21 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
 
   const getStatusBadge = (status: DeviceMovementStatus) => {
     switch (status) {
-      case 'moving_left':
+      case 'left_command_sent':
         return {
-          text: 'COMMAND: MOVING LEFT',
+          text: 'SIGNAL SENT: MOVE LEFT',
           classes: 'bg-[#E8F5E9] text-[#1B5E20] border-[#C8E6C9]',
           dot: 'bg-[#2E7D32]',
         };
-      case 'moving_right':
+      case 'right_command_sent':
         return {
-          text: 'COMMAND: MOVING RIGHT',
+          text: 'SIGNAL SENT: MOVE RIGHT',
           classes: 'bg-[#E8F5E9] text-[#1B5E20] border-[#C8E6C9]',
           dot: 'bg-[#2E7D32]',
         };
-      case 'stopped':
+      case 'stop_command_sent':
         return {
-          text: 'MOTOR STOPPED',
+          text: 'STOP COMMAND SENT',
           classes: 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]',
           dot: 'bg-[#D97706]',
         };
@@ -56,7 +56,7 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
         };
       default:
         return {
-          text: 'CONTROLLER READY',
+          text: 'CONTROLLER READY (NO MOTOR FEEDBACK)',
           classes: 'bg-[#F2F6F4] text-[#2F6F5E] border-[#E2EAE6]',
           dot: 'bg-[#58977F]',
         };
@@ -64,6 +64,15 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
   };
 
   const badge = getStatusBadge(movementStatus);
+
+  const getLimitLabel = (val: boolean | null | undefined) => {
+    if (val === true) return { text: 'ACTIVE', color: 'text-[#DC2626]' };
+    if (val === false) return { text: 'CLEAR', color: 'text-[#2E7D32]' };
+    return { text: 'UNKNOWN', color: 'text-[#5C736B]' };
+  };
+
+  const leftInfo = getLimitLabel(limitLeft);
+  const rightInfo = getLimitLabel(limitRight);
 
   return (
     <section id="device-control" className="flora-card p-6 mt-8">
@@ -85,7 +94,7 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
       </div>
 
       <p className="text-xs text-[#5C736B] mb-5 leading-relaxed max-w-2xl">
-        Kendalikan posisi carriage scanner optik di sepanjang rel inspeksi melalui driver motor DC L298N. Perintah diteruskan ke broker MQTT dengan proteksi limit switch aktif.
+        Kirimkan perintah gerak ke carriage scanner optik melalui broker MQTT. Status di bawah mencerminkan sinyal perintah yang diterbitkan (umpan balik posisi fisik motor tidak dilaporkan oleh perangkat keras).
       </p>
 
       {/* Control Buttons Trio */}
@@ -95,13 +104,13 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
           onClick={() => sendCommand('L')}
           disabled={isSending || isLeftBlocked}
           className={`py-3 px-4 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 border shadow-sm ${
-            movementStatus === 'moving_left'
+            movementStatus === 'left_command_sent'
               ? 'bg-[#17483B] text-white border-[#17483B] ring-2 ring-[#8FBEA8]'
               : isLeftBlocked
               ? 'bg-[#F2F6F4] text-[#5C736B]/60 border-[#E2EAE6] cursor-not-allowed'
               : 'bg-white hover:bg-[#F2F6F4] text-[#17332B] border-[#E2EAE6]'
           } disabled:opacity-50 disabled:cursor-not-allowed`}
-          title={isLeftBlocked ? 'Left Limit Switch Active - Left motion blocked' : 'Move scanner carriage left'}
+          title={isLeftBlocked ? 'Left Limit Switch Active - Left motion blocked' : 'Send move left command'}
         >
           <span>◀</span>
           <span>Move Left</span>
@@ -117,7 +126,7 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
           onClick={() => sendCommand('S')}
           disabled={isSending}
           className="py-3 px-4 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white border border-[#B91C1C] shadow-sm disabled:opacity-50"
-          title="Stop carriage motor immediately"
+          title="Send stop motor command immediately"
         >
           <span className="text-sm">■</span>
           <span>STOP MOTOR</span>
@@ -128,13 +137,13 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
           onClick={() => sendCommand('R')}
           disabled={isSending || isRightBlocked}
           className={`py-3 px-4 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 border shadow-sm ${
-            movementStatus === 'moving_right'
+            movementStatus === 'right_command_sent'
               ? 'bg-[#17483B] text-white border-[#17483B] ring-2 ring-[#8FBEA8]'
               : isRightBlocked
               ? 'bg-[#F2F6F4] text-[#5C736B]/60 border-[#E2EAE6] cursor-not-allowed'
               : 'bg-white hover:bg-[#F2F6F4] text-[#17332B] border-[#E2EAE6]'
           } disabled:opacity-50 disabled:cursor-not-allowed`}
-          title={isRightBlocked ? 'Right Limit Switch Active - Right motion blocked' : 'Move scanner carriage right'}
+          title={isRightBlocked ? 'Right Limit Switch Active - Right motion blocked' : 'Send move right command'}
         >
           <span>Move Right</span>
           <span>▶</span>
@@ -150,7 +159,7 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
         <div className="bg-[#F2F6F4] border border-[#E2EAE6] rounded-xl p-3 flex items-center justify-between">
           <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider">
-            Command Status
+            Command Dispatch
           </span>
           <span className="text-xs font-bold text-[#17332B] capitalize">
             {movementStatus.replace(/_/g, ' ')}
@@ -159,7 +168,7 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
 
         <div className="bg-[#F2F6F4] border border-[#E2EAE6] rounded-xl p-3 flex items-center justify-between">
           <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider">
-            Last Command Dispatched
+            Last Command Sent
           </span>
           <span className="text-xs font-bold font-tabular text-[#17332B]">
             {lastCommand ? `Cmd '${lastCommand}'` : 'None'}
@@ -168,15 +177,15 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
 
         <div className="bg-[#F2F6F4] border border-[#E2EAE6] rounded-xl p-3 flex items-center justify-between">
           <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider">
-            Hardware Limit Switches
+            Limit Switches
           </span>
           <div className="flex items-center gap-2 text-xs font-bold font-tabular">
-            <span className={limitLeft ? 'text-[#DC2626]' : 'text-[#2E7D32]'}>
-              L: {limitLeft ? 'ENGAGED' : 'CLEAR'}
+            <span className={leftInfo.color}>
+              L: {leftInfo.text}
             </span>
             <span className="text-[#5C736B]/40">|</span>
-            <span className={limitRight ? 'text-[#DC2626]' : 'text-[#2E7D32]'}>
-              R: {limitRight ? 'ENGAGED' : 'CLEAR'}
+            <span className={rightInfo.color}>
+              R: {rightInfo.text}
             </span>
           </div>
         </div>
@@ -184,7 +193,7 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
 
       <div className="mt-4 pt-3 border-t border-[#E2EAE6]">
         <p className="text-[11px] text-[#5C736B] m-0 leading-relaxed">
-          Perintah diterbitkan ke MQTT topic <code className="bg-[#F2F6F4] px-1.5 py-0.5 rounded border border-[#E2EAE6] font-mono text-[10px] text-[#17332B]">grenvis/device/control</code>. Status gerakan di atas mengonfirmasi pengiriman sinyal kontrol ke broker.
+          Perintah diterbitkan ke MQTT topic <code className="bg-[#F2F6F4] px-1.5 py-0.5 rounded border border-[#E2EAE6] font-mono text-[10px] text-[#17332B]">grenvis/device/control</code>. Status mengonfirmasi transmisi perintah ke broker (bukan konfirmasi sensorik posisi fisik).
         </p>
       </div>
     </section>
