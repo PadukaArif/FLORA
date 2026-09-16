@@ -113,6 +113,27 @@ export interface WateringEvent {
   note: string;
 }
 
+export type RealtimeSystemState =
+  | 'LOADING'
+  | 'CONNECTED'
+  | 'LIVE'
+  | 'STALE'
+  | 'DISCONNECTED'
+  | 'ERROR';
+
+export interface SystemStatusInfo {
+  state: RealtimeSystemState;
+  label: string;
+  badgeText: string;
+  description: string;
+  lastUpdateText: string | null;
+  secondsAgo: number | null;
+  indicatorColor: string;
+  reconnectMessage: string | null;
+  isLive: boolean;
+  isStale: boolean;
+}
+
 export type MqttStatus = 'CONNECTED' | 'DISCONNECTED' | 'RECONNECTING' | string;
 
 export interface DashboardState {

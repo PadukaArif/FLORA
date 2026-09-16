@@ -37,9 +37,9 @@ export const App: React.FC = () => {
   const [expStage, setExpStage] = useState<'boot' | 'plant' | 'dashboard'>('boot');
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const { message, visible, showToast } = useToast();
-  const { data, systemState, wsStatus, refresh, recordWatering } = useDashboard(showToast);
+  const { data, systemState, systemStatus, wsStatus, refresh, recordWatering } = useDashboard(showToast);
   const activeSection = useScrollSpy(sectionIds, 140);
-  const { relativeText, isStale } = useRelativeTime(data?.latest?.timestamp);
+  const { relativeText } = useRelativeTime(data?.latest?.timestamp);
 
   const handleNavigate = (sectionId: string) => {
     const el = document.getElementById(sectionId);
@@ -47,6 +47,11 @@ export const App: React.FC = () => {
       el.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  const lastWateringEvent =
+    data?.wateringEvents && data.wateringEvents.length > 0
+      ? data.wateringEvents[data.wateringEvents.length - 1]
+      : null;
 
   return (
     <div className="min-h-screen bg-[#F7FAF8] text-[#1B2408] flex flex-col font-sans">
@@ -72,6 +77,7 @@ export const App: React.FC = () => {
           {/* Refined Botanical Sidebar */}
           <Sidebar
             systemState={systemState}
+            systemStatus={systemStatus}
             activeSection={activeSection}
             onNavigate={handleNavigate}
             mobileOpen={mobileMenuOpen}
@@ -83,9 +89,10 @@ export const App: React.FC = () => {
             <Header
               onRefresh={refresh}
               onOpenMobileMenu={() => setMobileMenuOpen(true)}
+              systemStatus={systemStatus}
               mqttStatus={data?.mqtt}
-              isStale={isStale}
-              lastTelemetryText={relativeText}
+              isStale={systemStatus.isStale}
+              lastTelemetryText={systemStatus.lastUpdateText || relativeText}
             />
 
             {/* In-Dashboard Realtime Status & Alert Banner */}
@@ -135,6 +142,8 @@ export const App: React.FC = () => {
                 <SmartWateringPanel
                   latest={data?.latest || null}
                   onWatered={recordWatering}
+                  wateringEvents={data?.wateringEvents || []}
+                  lastWateringEvent={lastWateringEvent}
                 />
               </div>
 
@@ -152,6 +161,7 @@ export const App: React.FC = () => {
                 latest={data?.latest || null}
                 mqttStatus={data?.mqtt}
                 wsStatus={wsStatus}
+                systemStatus={systemStatus}
               />
 
               {/* Footer */}

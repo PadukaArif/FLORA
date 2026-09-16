@@ -1,19 +1,23 @@
 import React from 'react';
-import { TelemetryRecord, MqttStatus } from '../../types/dashboard';
+import { TelemetryRecord, MqttStatus, SystemStatusInfo } from '../../types/dashboard';
 
 interface DeviceHealthSectionProps {
   latest: TelemetryRecord | null;
   mqttStatus?: MqttStatus;
   wsStatus?: 'connecting' | 'connected' | 'disconnected';
+  systemStatus?: SystemStatusInfo;
 }
 
 export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({
   latest,
   mqttStatus = 'DISCONNECTED',
   wsStatus = 'connecting',
+  systemStatus,
 }) => {
-  const isOnline = latest?.timestamp
-    ? Date.now() - Date.parse(latest.timestamp) < 25000
+  const isOnline = systemStatus
+    ? systemStatus.isLive
+    : latest?.timestamp
+    ? Date.now() - Date.parse(latest.timestamp) <= 15000
     : false;
 
   // 1. ESP32 Main Node
@@ -161,12 +165,24 @@ export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({
         </div>
         <span
           className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
-            isOnline && mqttStatus === 'CONNECTED'
+            systemStatus?.state === 'LIVE'
+              ? 'bg-[#EAF4E8] text-[#22531A] border-[#C4E1BF]'
+              : systemStatus?.state === 'STALE'
+              ? 'bg-[#FEF7E8] text-[#8A570C] border-[#FDE3B5]'
+              : isOnline && mqttStatus === 'CONNECTED'
               ? 'bg-[#EAF4E8] text-[#22531A] border-[#C4E1BF]'
               : 'bg-[#FEF7E8] text-[#8A570C] border-[#FDE3B5]'
           }`}
         >
-          {isOnline && mqttStatus === 'CONNECTED' ? 'Telemetry Stream Active' : 'Degraded Telemetry'}
+          {systemStatus
+            ? systemStatus.state === 'LIVE'
+              ? 'Telemetry Stream Active'
+              : systemStatus.state === 'STALE'
+              ? 'Telemetry Stale'
+              : systemStatus.badgeText
+            : isOnline && mqttStatus === 'CONNECTED'
+            ? 'Telemetry Stream Active'
+            : 'Degraded Telemetry'}
         </span>
       </div>
 

@@ -1,7 +1,9 @@
 import React from 'react';
+import { SystemStatusInfo } from '../../types/dashboard';
 
 interface SidebarProps {
   systemState: string;
+  systemStatus?: SystemStatusInfo;
   activeSection: string;
   onNavigate: (sectionId: string) => void;
   mobileOpen: boolean;
@@ -99,12 +101,15 @@ export const navItems = [
 
 export const Sidebar: React.FC<SidebarProps> = ({
   systemState,
+  systemStatus,
   activeSection,
   onNavigate,
   mobileOpen,
   onCloseMobile,
 }) => {
-  const isOnline = systemState.toLowerCase().includes('active') || systemState.toLowerCase().includes('ready');
+  const isOnline = systemStatus
+    ? systemStatus.isLive
+    : systemState.toLowerCase().includes('active') || systemState.toLowerCase().includes('live');
 
   const navContent = (
     <div className="flex flex-col h-full p-4 lg:p-5 text-[#F0F4E8]">
@@ -116,46 +121,39 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </svg>
         </div>
         <div className="min-w-0">
-          <div className="font-bold text-[15px] tracking-wide text-white font-display leading-tight flex items-center gap-1.5">
-            <span>FLORA</span>
-          </div>
-          <div className="text-[11px] text-[#C3D883] leading-tight font-medium mt-0.5 truncate">
-            Botanical Intelligence
-          </div>
+          <span className="block text-xs font-bold tracking-widest text-[#9DB312] uppercase font-display">
+            FLORA
+          </span>
+          <span className="block text-xs font-semibold text-[#F0F4E8]/90 truncate">
+            Intelligent Plant Console
+          </span>
         </div>
       </div>
 
-      {/* Navigation List */}
-      <div className="my-5 flex-1 overflow-y-auto">
-        <p className="text-[10px] font-bold text-[#9DB312]/80 uppercase tracking-widest px-3 mb-2.5">
-          Navigation
-        </p>
-        <nav className="flex flex-col gap-1">
+      {/* Navigation Links */}
+      <div className="flex-1 py-4 overflow-y-auto">
+        <span className="text-[10px] font-bold text-[#C3D883] uppercase tracking-wider px-3 mb-2 block">
+          Telemetry &amp; Controls
+        </span>
+        <nav className="space-y-1">
           {navItems.map((item) => {
             const isActive = activeSection === item.id;
             return (
-              <a
+              <button
                 key={item.id}
-                href={`#${item.id}`}
-                onClick={(e) => {
-                  e.preventDefault();
+                onClick={() => {
                   onNavigate(item.id);
                   onCloseMobile();
                 }}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-150 relative ${
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-[#597C00] text-white font-semibold shadow-xs'
-                    : 'text-[#C3D883] hover:bg-[#2A3B0B] hover:text-white'
+                    ? 'bg-[#597C00] text-white shadow-xs font-bold'
+                    : 'text-[#C3D883] hover:text-white hover:bg-[#2C3B0E]/60'
                 }`}
               >
-                <span className={`shrink-0 transition-opacity ${isActive ? 'opacity-100 text-white' : 'opacity-75'}`}>
-                  {item.icon}
-                </span>
-                <span className="truncate">{item.label}</span>
-                {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#9DB312] ml-auto shrink-0 shadow-[0_0_6px_rgba(157,179,18,0.8)]" />
-                )}
-              </a>
+                <span className={isActive ? 'text-white' : 'text-[#9DB312]'}>{item.icon}</span>
+                <span>{item.label}</span>
+              </button>
             );
           })}
         </nav>
@@ -166,15 +164,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="bg-[#141D04] p-3 rounded-xl border border-[#2C3B0E] flex items-center gap-2.5">
           <span
             className={`w-2 h-2 rounded-full shrink-0 ${
-              isOnline ? 'bg-[#9DB312] shadow-[0_0_6px_rgba(157,179,18,0.7)]' : 'bg-[#D97706]'
+              systemStatus
+                ? systemStatus.indicatorColor
+                : isOnline
+                ? 'bg-[#9DB312] shadow-[0_0_6px_rgba(157,179,18,0.7)]'
+                : 'bg-[#D97706]'
             }`}
           />
           <div className="min-w-0 flex-1">
             <span className="block text-[9px] text-[#C3D883] font-semibold uppercase tracking-wider">
               System Channel
             </span>
-            <span className="block text-xs font-semibold text-white truncate mt-0.5">
-              {systemState}
+            <div className="flex items-center justify-between gap-1 mt-0.5">
+              <span className="block text-xs font-bold text-white uppercase tracking-wider truncate">
+                {systemStatus ? systemStatus.state : systemState}
+              </span>
+              {systemStatus?.secondsAgo !== null && systemStatus?.secondsAgo !== undefined && (
+                <span className="text-[10px] text-[#C3D883]/80 font-tabular shrink-0">
+                  {systemStatus.secondsAgo <= 15 ? `${systemStatus.secondsAgo}s ago` : `${systemStatus.secondsAgo}s`}
+                </span>
+              )}
+            </div>
+            <span className="block text-[10px] text-[#C3D883]/70 truncate mt-0.5">
+              {systemStatus
+                ? systemStatus.state === 'LIVE'
+                  ? 'Live telemetry stream'
+                  : systemStatus.description
+                : ''}
             </span>
           </div>
         </div>

@@ -1,10 +1,12 @@
 import React from 'react';
 import { useClock } from '../../hooks/useClock';
+import { SystemStatusInfo } from '../../types/dashboard';
 
 interface HeaderProps {
   onRefresh: () => void;
   onOpenMobileMenu?: () => void;
   isRefreshing?: boolean;
+  systemStatus?: SystemStatusInfo;
   mqttStatus?: string;
   isStale?: boolean;
   lastTelemetryText?: string;
@@ -14,12 +16,55 @@ export const Header: React.FC<HeaderProps> = ({
   onRefresh,
   onOpenMobileMenu,
   isRefreshing,
+  systemStatus,
   mqttStatus = 'DISCONNECTED',
   isStale = false,
   lastTelemetryText,
 }) => {
   const clock = useClock();
-  const isMqttConnected = mqttStatus === 'CONNECTED';
+
+  // Fallback if systemStatus is not provided directly
+  const status: SystemStatusInfo = systemStatus || {
+    state: mqttStatus === 'CONNECTED' ? (isStale ? 'STALE' : 'LIVE') : 'DISCONNECTED',
+    label: mqttStatus === 'CONNECTED' ? (isStale ? 'STALE' : 'LIVE') : 'DISCONNECTED',
+    badgeText: mqttStatus === 'CONNECTED' ? (isStale ? 'Telemetry Stale' : 'Live Stream') : 'Disconnected',
+    description:
+      mqttStatus === 'CONNECTED'
+        ? isStale
+          ? 'Telemetry stale'
+          : 'Live telemetry'
+        : 'Trying to reconnect...',
+    lastUpdateText: lastTelemetryText ? `Last update: ${lastTelemetryText}` : null,
+    secondsAgo: null,
+    indicatorColor:
+      mqttStatus === 'CONNECTED' && !isStale
+        ? 'bg-[#597C00] animate-pulse'
+        : mqttStatus === 'CONNECTED' && isStale
+        ? 'bg-[#D97706]'
+        : 'bg-[#DC2626]',
+    reconnectMessage: mqttStatus === 'CONNECTED' ? null : 'Trying to reconnect...',
+    isLive: mqttStatus === 'CONNECTED' && !isStale,
+    isStale,
+  };
+
+  const getStatusDisplayText = () => {
+    switch (status.state) {
+      case 'LIVE':
+        return status.lastUpdateText || 'Live telemetry';
+      case 'STALE':
+        return status.description || 'Telemetry stale';
+      case 'CONNECTED':
+        return 'Connection established. Waiting for telemetry.';
+      case 'LOADING':
+        return 'Connecting to FLORA...';
+      case 'DISCONNECTED':
+        return 'Disconnected · Trying to reconnect...';
+      case 'ERROR':
+        return status.description || 'Connection error';
+      default:
+        return status.description;
+    }
+  };
 
   return (
     <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-5 mb-5 border-b border-[#E4EBE0]">
@@ -52,29 +97,20 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="flex items-center gap-2.5 self-end sm:self-auto flex-wrap">
-        {/* Realtime Status Badge */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-[#E4EBE0] text-xs shadow-xs">
+        {/* Realtime System Channel State Badge */}
+        <div
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-[#E4EBE0] text-xs shadow-xs"
+          title={status.description}
+        >
           <span
-            className={`w-2 h-2 rounded-full ${
-              isMqttConnected && !isStale
-                ? 'bg-[#597C00] animate-pulse'
-                : isMqttConnected && isStale
-                ? 'bg-[#D97706]'
-                : 'bg-[#DC2626]'
-            }`}
+            className={`w-2 h-2 rounded-full shrink-0 ${status.indicatorColor}`}
           />
-          <span className="font-semibold text-[#1B2408]">
-            {isMqttConnected
-              ? isStale
-                ? 'Telemetry Stale'
-                : 'Live Stream'
-              : 'MQTT Disconnected'}
+          <span className="font-bold text-[#1B2408] font-display text-[11px] uppercase tracking-wider">
+            {status.state}
           </span>
-          {lastTelemetryText && (
-            <span className="text-[10px] text-[#617253] font-tabular border-l border-[#E4EBE0] pl-2">
-              {lastTelemetryText}
-            </span>
-          )}
+          <span className="text-[11px] text-[#617253] font-tabular border-l border-[#E4EBE0] pl-2 hidden sm:inline-block max-w-[220px] truncate">
+            {getStatusDisplayText()}
+          </span>
         </div>
 
         {/* Clock */}
