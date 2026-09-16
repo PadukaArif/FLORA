@@ -27,19 +27,19 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
       case 'left_command_sent':
         return {
           text: 'SIGNAL SENT: MOVE LEFT',
-          classes: 'bg-[#E8F5E9] text-[#1B5E20] border-[#C8E6C9]',
-          dot: 'bg-[#2E7D32]',
+          classes: 'bg-[#EAF4E8] text-[#22531A] border-[#C4E1BF]',
+          dot: 'bg-[#367C29]',
         };
       case 'right_command_sent':
         return {
           text: 'SIGNAL SENT: MOVE RIGHT',
-          classes: 'bg-[#E8F5E9] text-[#1B5E20] border-[#C8E6C9]',
-          dot: 'bg-[#2E7D32]',
+          classes: 'bg-[#EAF4E8] text-[#22531A] border-[#C4E1BF]',
+          dot: 'bg-[#367C29]',
         };
       case 'stop_command_sent':
         return {
           text: 'STOP COMMAND SENT',
-          classes: 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]',
+          classes: 'bg-[#FEF7E8] text-[#8A570C] border-[#FDE3B5]',
           dot: 'bg-[#D97706]',
         };
       case 'sending':
@@ -51,14 +51,14 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
       case 'error':
         return {
           text: 'DISPATCH ERROR',
-          classes: 'bg-[#FEE2E2] text-[#991B1B] border-[#FECACA]',
+          classes: 'bg-[#FEEAEA] text-[#961C1C] border-[#FCCECE]',
           dot: 'bg-[#DC2626]',
         };
       default:
         return {
           text: 'CONTROLLER READY (NO MOTOR FEEDBACK)',
-          classes: 'bg-[#F2F6F4] text-[#2F6F5E] border-[#E2EAE6]',
-          dot: 'bg-[#58977F]',
+          classes: 'bg-[#F4F7F2] text-[#597C00] border-[#E4EBE0]',
+          dot: 'bg-[#597C00]',
         };
     }
   };
@@ -67,21 +67,21 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
 
   const getLimitLabel = (val: boolean | null | undefined) => {
     if (val === true) return { text: 'ACTIVE', color: 'text-[#DC2626]' };
-    if (val === false) return { text: 'CLEAR', color: 'text-[#2E7D32]' };
-    return { text: 'UNKNOWN', color: 'text-[#5C736B]' };
+    if (val === false) return { text: 'CLEAR', color: 'text-[#367C29]' };
+    return { text: 'UNKNOWN', color: 'text-[#617253]' };
   };
 
   const leftInfo = getLimitLabel(limitLeft);
   const rightInfo = getLimitLabel(limitRight);
 
   return (
-    <section id="device-control" className="flora-card p-6 mt-8 rounded-2xl bg-white border border-[#E2EAE6] shadow-sm">
+    <section id="device-control" className="flora-card p-6 mt-8 shadow-xs">
       <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
         <div>
-          <span className="text-[11px] font-semibold text-[#2F6F5E] uppercase tracking-wider block">
-            Linear Actuator Subsystem
+          <span className="text-[10px] font-bold text-[#597C00] uppercase tracking-widest block">
+            Actuator Subsystem
           </span>
-          <h2 className="text-lg font-bold text-[#17332B] font-display">
+          <h2 className="text-lg font-bold text-[#1B2408] font-display">
             Scanner Carriage Manual Control
           </h2>
         </div>
@@ -93,8 +93,8 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
         </span>
       </div>
 
-      <p className="text-xs text-[#5C736B] mb-5 leading-relaxed max-w-2xl">
-        Kirimkan perintah gerak ke carriage scanner optik melalui broker MQTT. Status di bawah mencerminkan sinyal perintah yang diterbitkan (umpan balik posisi fisik motor tidak dilaporkan oleh perangkat keras).
+      <p className="text-xs text-[#617253] mb-5 leading-relaxed max-w-2xl">
+        Kirimkan sinyal perintah gerak carriage scanner optik melalui broker MQTT. Status mencerminkan sinyal perintah yang diterbitkan (umpan balik posisi fisik motor tidak dilaporkan oleh perangkat keras).
       </p>
 
       {/* Control Buttons Trio */}
@@ -103,19 +103,19 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
         <button
           onClick={() => sendCommand('L')}
           disabled={isSending || isLeftBlocked}
-          className={`py-3 px-4 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 border shadow-sm ${
+          className={`py-3 px-4 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 border shadow-xs ${
             movementStatus === 'left_command_sent'
-              ? 'bg-[#17483B] text-white border-[#17483B] ring-2 ring-[#8FBEA8]'
+              ? 'bg-[#1E2805] text-white border-[#1E2805] ring-2 ring-[#9DB312]'
               : isLeftBlocked
-              ? 'bg-[#F2F6F4] text-[#5C736B]/60 border-[#E2EAE6] cursor-not-allowed'
-              : 'bg-white hover:bg-[#F2F6F4] text-[#17332B] border-[#E2EAE6]'
+              ? 'bg-[#F4F7F2] text-[#617253]/60 border-[#E4EBE0] cursor-not-allowed'
+              : 'bg-white hover:bg-[#F4F7F2] text-[#1B2408] border-[#E4EBE0] cursor-pointer'
           } disabled:opacity-50 disabled:cursor-not-allowed`}
           title={isLeftBlocked ? 'Left Limit Switch Active - Left motion blocked' : 'Send move left command'}
         >
           <span>◀</span>
           <span>Move Left</span>
           {isLeftBlocked && (
-            <span className="text-[10px] font-semibold bg-[#FEE2E2] text-[#991B1B] px-1.5 py-0.5 rounded border border-[#FECACA]">
+            <span className="text-[10px] font-semibold bg-[#FEEAEA] text-[#961C1C] px-1.5 py-0.5 rounded border border-[#FCCECE]">
               Limit
             </span>
           )}
@@ -125,7 +125,7 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
         <button
           onClick={() => sendCommand('S')}
           disabled={isSending}
-          className="py-3 px-4 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white border border-[#B91C1C] shadow-sm disabled:opacity-50"
+          className="py-3 px-4 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white border border-[#B91C1C] shadow-xs disabled:opacity-50 cursor-pointer"
           title="Send stop motor command immediately"
         >
           <span className="text-sm">■</span>
@@ -136,19 +136,19 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
         <button
           onClick={() => sendCommand('R')}
           disabled={isSending || isRightBlocked}
-          className={`py-3 px-4 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 border shadow-sm ${
+          className={`py-3 px-4 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 border shadow-xs ${
             movementStatus === 'right_command_sent'
-              ? 'bg-[#17483B] text-white border-[#17483B] ring-2 ring-[#8FBEA8]'
+              ? 'bg-[#1E2805] text-white border-[#1E2805] ring-2 ring-[#9DB312]'
               : isRightBlocked
-              ? 'bg-[#F2F6F4] text-[#5C736B]/60 border-[#E2EAE6] cursor-not-allowed'
-              : 'bg-white hover:bg-[#F2F6F4] text-[#17332B] border-[#E2EAE6]'
+              ? 'bg-[#F4F7F2] text-[#617253]/60 border-[#E4EBE0] cursor-not-allowed'
+              : 'bg-white hover:bg-[#F4F7F2] text-[#1B2408] border-[#E4EBE0] cursor-pointer'
           } disabled:opacity-50 disabled:cursor-not-allowed`}
           title={isRightBlocked ? 'Right Limit Switch Active - Right motion blocked' : 'Send move right command'}
         >
           <span>Move Right</span>
           <span>▶</span>
           {isRightBlocked && (
-            <span className="text-[10px] font-semibold bg-[#FEE2E2] text-[#991B1B] px-1.5 py-0.5 rounded border border-[#FECACA]">
+            <span className="text-[10px] font-semibold bg-[#FEEAEA] text-[#961C1C] px-1.5 py-0.5 rounded border border-[#FCCECE]">
               Limit
             </span>
           )}
@@ -157,33 +157,33 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
 
       {/* Hardware Telemetry & Safety Status */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
-        <div className="bg-[#F2F6F4] border border-[#E2EAE6] rounded-xl p-3 flex items-center justify-between">
-          <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider">
+        <div className="bg-[#F4F7F2] border border-[#E4EBE0] rounded-xl p-3 flex items-center justify-between">
+          <span className="text-[10px] font-semibold text-[#617253] uppercase tracking-wider">
             Command Dispatch
           </span>
-          <span className="text-xs font-bold text-[#17332B] capitalize">
+          <span className="text-xs font-bold text-[#1B2408] capitalize">
             {movementStatus.replace(/_/g, ' ')}
           </span>
         </div>
 
-        <div className="bg-[#F2F6F4] border border-[#E2EAE6] rounded-xl p-3 flex items-center justify-between">
-          <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider">
+        <div className="bg-[#F4F7F2] border border-[#E4EBE0] rounded-xl p-3 flex items-center justify-between">
+          <span className="text-[10px] font-semibold text-[#617253] uppercase tracking-wider">
             Last Command Sent
           </span>
-          <span className="text-xs font-bold font-tabular text-[#17332B]">
+          <span className="text-xs font-bold font-tabular text-[#1B2408]">
             {lastCommand ? `Cmd '${lastCommand}'` : 'None'}
           </span>
         </div>
 
-        <div className="bg-[#F2F6F4] border border-[#E2EAE6] rounded-xl p-3 flex items-center justify-between">
-          <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider">
+        <div className="bg-[#F4F7F2] border border-[#E4EBE0] rounded-xl p-3 flex items-center justify-between">
+          <span className="text-[10px] font-semibold text-[#617253] uppercase tracking-wider">
             Limit Switches
           </span>
           <div className="flex items-center gap-2 text-xs font-bold font-tabular">
             <span className={leftInfo.color}>
               L: {leftInfo.text}
             </span>
-            <span className="text-[#5C736B]/40">|</span>
+            <span className="text-[#617253]/40">|</span>
             <span className={rightInfo.color}>
               R: {rightInfo.text}
             </span>
@@ -191,9 +191,9 @@ export const ManualDeviceControl: React.FC<ManualDeviceControlProps> = ({
         </div>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-[#E2EAE6]">
-        <p className="text-[11px] text-[#5C736B] m-0 leading-relaxed">
-          Perintah diterbitkan ke MQTT topic <code className="bg-[#F2F6F4] px-1.5 py-0.5 rounded border border-[#E2EAE6] font-mono text-[10px] text-[#17332B]">grenvis/device/control</code>. Status mengonfirmasi transmisi perintah ke broker (bukan konfirmasi sensorik posisi fisik).
+      <div className="mt-4 pt-3 border-t border-[#E4EBE0]">
+        <p className="text-[11px] text-[#617253] m-0 leading-relaxed">
+          Perintah gerak dipublikasikan ke broker MQTT topik <code className="bg-[#F4F7F2] px-1.5 py-0.5 rounded border border-[#E4EBE0] font-mono text-[10px] text-[#1B2408]">grenvis/device/control</code>.
         </p>
       </div>
     </section>

@@ -107,25 +107,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const isOnline = systemState.toLowerCase().includes('active') || systemState.toLowerCase().includes('ready');
 
   const navContent = (
-    <div className="flex flex-col h-full p-4 lg:p-5 text-[#DCECE5]">
-      {/* Brand Header - Quiet & Clean */}
-      <div className="flex items-center gap-3 pb-5 border-b border-[#235849]/80">
-        <div className="w-9 h-9 rounded-xl bg-[#2F6F5E] text-[#DCECE5] flex items-center justify-center font-bold text-base border border-[#58977F]/40 shadow-sm shrink-0">
-          F
+    <div className="flex flex-col h-full p-4 lg:p-5 text-[#F0F4E8]">
+      {/* Brand Header with Signature Botanical Star */}
+      <div className="flex items-center gap-3 pb-5 border-b border-[#2C3B0E]">
+        <div className="w-9 h-9 rounded-xl bg-[#597C00] text-white flex items-center justify-center border border-[#9DB312]/40 shadow-sm shrink-0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0 C12 7 17 12 24 12 C17 12 12 17 12 24 C12 17 7 12 0 12 C7 12 12 7 12 0 Z" />
+          </svg>
         </div>
         <div className="min-w-0">
-          <div className="font-bold text-[15px] tracking-wide text-white font-display leading-tight">
-            FLORA
+          <div className="font-bold text-[15px] tracking-wide text-white font-display leading-tight flex items-center gap-1.5">
+            <span>FLORA</span>
           </div>
-          <div className="text-[11px] text-[#8FBEA8] leading-tight font-medium mt-0.5 truncate">
-            Smart Plant &amp; AI System
+          <div className="text-[11px] text-[#C3D883] leading-tight font-medium mt-0.5 truncate">
+            Botanical Intelligence
           </div>
         </div>
       </div>
 
       {/* Navigation List */}
       <div className="my-5 flex-1 overflow-y-auto">
-        <p className="text-[10px] font-semibold text-[#8FBEA8]/70 uppercase tracking-wider px-3 mb-2.5">
+        <p className="text-[10px] font-bold text-[#9DB312]/80 uppercase tracking-widest px-3 mb-2.5">
           Navigation
         </p>
         <nav className="flex flex-col gap-1">
@@ -140,18 +142,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onNavigate(item.id);
                   onCloseMobile();
                 }}
-                className={`flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 relative ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-150 relative ${
                   isActive
-                    ? 'bg-[#2F6F5E] text-white font-semibold shadow-sm'
-                    : 'text-[#8FBEA8] hover:bg-[#1C5142] hover:text-white'
+                    ? 'bg-[#597C00] text-white font-semibold shadow-xs'
+                    : 'text-[#C3D883] hover:bg-[#2A3B0B] hover:text-white'
                 }`}
               >
-                <span className={`shrink-0 transition-opacity ${isActive ? 'opacity-100 text-white' : 'opacity-70'}`}>
+                <span className={`shrink-0 transition-opacity ${isActive ? 'opacity-100 text-white' : 'opacity-75'}`}>
                   {item.icon}
                 </span>
                 <span className="truncate">{item.label}</span>
                 {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#8FBEA8] ml-auto shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#9DB312] ml-auto shrink-0 shadow-[0_0_6px_rgba(157,179,18,0.8)]" />
                 )}
               </a>
             );
@@ -160,15 +162,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* System Health Summary at Bottom */}
-      <div className="pt-4 border-t border-[#235849]/80 shrink-0">
-        <div className="bg-[#10352B] p-3 rounded-xl border border-[#235849] flex items-center gap-2.5">
+      <div className="pt-4 border-t border-[#2C3B0E] shrink-0">
+        <div className="bg-[#141D04] p-3 rounded-xl border border-[#2C3B0E] flex items-center gap-2.5">
           <span
             className={`w-2 h-2 rounded-full shrink-0 ${
-              isOnline ? 'bg-[#4ADE80] shadow-[0_0_6px_rgba(74,222,128,0.5)]' : 'bg-[#FBBF24]'
+              isOnline ? 'bg-[#9DB312] shadow-[0_0_6px_rgba(157,179,18,0.7)]' : 'bg-[#D97706]'
             }`}
           />
           <div className="min-w-0 flex-1">
-            <span className="block text-[9px] text-[#8FBEA8] font-semibold uppercase tracking-wider">
+            <span className="block text-[9px] text-[#C3D883] font-semibold uppercase tracking-wider">
               System Channel
             </span>
             <span className="block text-xs font-semibold text-white truncate mt-0.5">
@@ -183,7 +185,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       {/* Desktop Sidebar (Sticky, stays with page as content scrolls) */}
-      <aside className="hidden lg:flex w-[240px] h-screen sticky top-0 shrink-0 bg-[#17483B] flex-col border-r border-[#235849] z-30">
+      <aside className="hidden lg:flex w-[240px] h-screen sticky top-0 shrink-0 bg-[#1E2805] flex-col border-r border-[#2C3B0E] z-30 shadow-md">
         {navContent}
       </aside>
 
@@ -194,16 +196,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={onCloseMobile}
         >
           <div
-            className="w-[260px] h-full bg-[#17483B] shadow-2xl flex flex-col z-50 animate-in slide-in-from-left duration-200"
+            className="w-[260px] h-full bg-[#1E2805] shadow-2xl flex flex-col z-50 animate-in slide-in-from-left duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center p-4 border-b border-[#235849]">
-              <span className="text-xs font-bold text-white uppercase tracking-wider font-display">
-                FLORA Menu
+            <div className="flex justify-between items-center p-4 border-b border-[#2C3B0E]">
+              <span className="text-xs font-bold text-white uppercase tracking-wider font-display flex items-center gap-1.5">
+                <span className="text-[#9DB312]">✦</span>
+                <span>FLORA Menu</span>
               </span>
               <button
                 onClick={onCloseMobile}
-                className="text-[#8FBEA8] hover:text-white p-1 rounded-md text-sm"
+                className="text-[#C3D883] hover:text-white p-1 rounded-md text-sm"
+                aria-label="Close navigation"
               >
                 ✕
               </button>

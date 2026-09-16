@@ -7,6 +7,7 @@ import { SplashScreen } from './components/experience/SplashScreen';
 import { Plant3DExperience } from './components/experience/Plant3DExperience';
 import { Sidebar } from './components/dashboard/Sidebar';
 import { Header } from './components/dashboard/Header';
+import { InDashboardAlert } from './components/dashboard/InDashboardAlert';
 import { HeroOverview } from './components/dashboard/HeroOverview';
 import { LiveMonitoring } from './components/dashboard/LiveMonitoring';
 import { EnvironmentalAiRiskPanel } from './components/dashboard/EnvironmentalAiRiskPanel';
@@ -36,7 +37,7 @@ export const App: React.FC = () => {
   const [expStage, setExpStage] = useState<'boot' | 'plant' | 'dashboard'>('boot');
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const { message, visible, showToast } = useToast();
-  const { data, systemState, refresh, recordWatering } = useDashboard(showToast);
+  const { data, systemState, wsStatus, refresh, recordWatering } = useDashboard(showToast);
   const activeSection = useScrollSpy(sectionIds, 140);
   const { relativeText, isStale } = useRelativeTime(data?.latest?.timestamp);
 
@@ -48,8 +49,8 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7FAF8] text-[#17332B] flex flex-col">
-      {/* 1. Splash Screen Boot Sequence - Fixed overlay, unmounted and deleted forever when finished */}
+    <div className="min-h-screen bg-[#F7FAF8] text-[#1B2408] flex flex-col font-sans">
+      {/* 1. Splash Screen Boot Sequence */}
       {expStage === 'boot' && (
         <SplashScreen
           onBootComplete={() => setExpStage('dashboard')}
@@ -65,10 +66,10 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* 3. FLORA Main Dashboard - Rendered underneath so circle outro seamlessly reveals it */}
+      {/* 3. FLORA Main Dashboard */}
       {expStage !== 'plant' && (
         <div className="flex flex-1 min-h-screen">
-          {/* Refined Sidebar */}
+          {/* Refined Botanical Sidebar */}
           <Sidebar
             systemState={systemState}
             activeSection={activeSection}
@@ -87,8 +88,17 @@ export const App: React.FC = () => {
               lastTelemetryText={relativeText}
             />
 
+            {/* In-Dashboard Realtime Status & Alert Banner */}
+            <div className="mb-6">
+              <InDashboardAlert
+                latest={data?.latest || null}
+                mqttStatus={data?.mqtt}
+                onNavigate={handleNavigate}
+              />
+            </div>
+
             <div className="space-y-8">
-              {/* 1. Overview */}
+              {/* 1. Overview & 4-Pillar Plant Insight */}
               <HeroOverview latest={data?.latest || null} />
 
               {/* 2. Live Telemetry with Interpretation */}
@@ -106,7 +116,7 @@ export const App: React.FC = () => {
                 <AiVisionPanel latest={data?.latest || null} />
               </div>
 
-              {/* 4. ESP32-CAM AI Vision Optical Capture */}
+              {/* 4. ESP32-CAM Leaf Canopy Optical Capture */}
               <CameraCapturePanel latest={data?.latest || null} />
 
               {/* 5. Manual Scanner Carriage Control */}
@@ -128,19 +138,20 @@ export const App: React.FC = () => {
                 />
               </div>
 
-              {/* 7. Environmental Trends & Multi-Sensor Chart */}
+              {/* 7. Multi-Sensor Historical Trends Chart */}
               <HistoryTrendsSection
                 history={data?.history || []}
                 trends={data?.summary?.trends}
               />
 
-              {/* 24-Hour Signal Summary */}
+              {/* 8. 24-Hour Signal Summary */}
               <DailySummaryPanel summary={data?.summary} />
 
-              {/* System & Hardware Topology */}
+              {/* 9. System & Hardware Topology */}
               <DeviceHealthSection
                 latest={data?.latest || null}
                 mqttStatus={data?.mqtt}
+                wsStatus={wsStatus}
               />
 
               {/* Footer */}

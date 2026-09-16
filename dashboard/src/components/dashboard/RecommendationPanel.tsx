@@ -1,99 +1,107 @@
 import React from 'react';
 import { TelemetryRecord } from '../../types/dashboard';
-import { generateFloraInsight } from '../../utils/sensorRules';
+import { evaluatePlantPillars } from '../../utils/sensorRules';
 
 interface RecommendationPanelProps {
   latest: TelemetryRecord | null;
 }
 
 export const RecommendationPanel: React.FC<RecommendationPanelProps> = ({ latest }) => {
-  const insight = generateFloraInsight(latest);
-  const condition = latest?.condition;
-  const actions = condition?.actions || [];
-  const factors = condition?.factors || [];
+  const pillars = evaluatePlantPillars(latest);
 
-  const getPriorityBadge = (p: string) => {
-    switch (p) {
-      case 'HIGH':
-        return 'bg-[#FEE2E2] text-[#991B1B] border-[#FECACA]';
-      case 'MEDIUM':
-        return 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]';
-      default:
-        return 'bg-[#E8F5E9] text-[#1B5E20] border-[#C8E6C9]';
+  const getPriorityBadge = () => {
+    if (pillars.soil.status === 'Critically Dry' || pillars.aiRisk.status === 'High') {
+      return { label: 'High Priority', classes: 'bg-[#FEEAEA] text-[#961C1C] border-[#FCCECE]' };
     }
+    if (pillars.soil.status === 'Needs Water' || pillars.environment.status === 'Warm' || pillars.aiVision.status === 'Rust' || pillars.aiVision.status === 'Powdery') {
+      return { label: 'Medium Priority', classes: 'bg-[#FEF7E8] text-[#8A570C] border-[#FDE3B5]' };
+    }
+    return { label: 'Normal / Routine', classes: 'bg-[#EAF4E8] text-[#22531A] border-[#C4E1BF]' };
   };
 
+  const priority = getPriorityBadge();
+
+  // Contextual human-crafted recommendations based on actual data
+  const getActionList = () => {
+    if (!latest) return ['Waiting for live telemetry stream from ESP32.'];
+
+    const actions: string[] = [];
+    const s = Number(latest.soil_moisture);
+    const t = Number(latest.temperature);
+    const v = (latest.vision_prediction || '').toLowerCase();
+
+    if (s < 20) {
+      actions.push('Kadar air tanah kritis (<20%): Lakukan penyiraman manual secukupnya segera.');
+    } else if (s < 30) {
+      actions.push('Tanah mulai mengering (<30%): Cek fisik media tanam dan lakukan penyiraman ringan.');
+    } else if (s > 80) {
+      actions.push('Tanah jenuh air (>80%): Tunda penyiraman berikutnya untuk mencegah busuk akar.');
+    }
+
+    if (t >= 35) {
+      actions.push('Suhu udara tinggi (≥35°C): Berikan naungan tambahan atau tingkatkan sirkulasi udara.');
+    }
+
+    if (v.includes('rust')) {
+      actions.push('Indikasi Rust: Periksa permukaan bawah daun dan hindari membasahi daun saat menyiram.');
+    } else if (v.includes('powdery')) {
+      actions.push('Indikasi Powdery: Pangkas daun bergejala parah dan pastikan aliran udara sekitar kanopi lancar.');
+    }
+
+    if (actions.length === 0) {
+      actions.push('Kondisi tanaman dan tanah saat ini optimal. Tidak diperlukan tindakan khusus.');
+      actions.push('Lanjutkan pemantauan telemetri rutin.');
+    }
+
+    return actions;
+  };
+
+  const actionList = getActionList();
+
   return (
-    <section className="flora-card p-6 flex flex-col justify-between rounded-2xl bg-white border border-[#E2EAE6] shadow-sm">
+    <section className="flora-card p-6 flex flex-col justify-between shadow-xs">
       <div>
         {/* Header */}
         <div className="flex justify-between items-start mb-3">
           <div>
-            <span className="text-[11px] font-semibold text-[#2F6F5E] uppercase tracking-wider block">
-              Decision Support &amp; Agronomic Advice
+            <span className="text-[10px] font-bold text-[#597C00] uppercase tracking-widest block">
+              Agronomic Decision Support
             </span>
-            <h2 className="text-base font-bold text-[#17332B] font-display">
-              FLORA Insight &amp; Treatment Guidance
+            <h2 className="text-base font-bold text-[#1B2408] font-display">
+              Treatment &amp; Action Guidance
             </h2>
           </div>
-          <span
-            className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${getPriorityBadge(
-              insight.priority
-            )}`}
-          >
-            {insight.priority} Priority
+          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${priority.classes}`}>
+            {priority.label}
           </span>
         </div>
 
-        {/* Combined FLORA Insight Banner */}
-        <div className="bg-[#F2F6F4] border border-[#E2EAE6] rounded-xl p-4 my-3">
-          <span className="text-[10px] font-bold text-[#2F6F5E] uppercase tracking-wider block mb-1">
-            Integrated Agronomic Insight
+        {/* Holistic Context Banner */}
+        <div className="bg-[#F4F7F2] border border-[#E4EBE0] rounded-xl p-4 my-3">
+          <span className="text-[10px] font-bold text-[#597C00] uppercase tracking-wider block mb-1">
+            Current Assessment
           </span>
-          <h3 className="text-sm font-bold text-[#17332B] mb-1 font-display">
-            {insight.headline}
-          </h3>
-          <p className="text-xs text-[#5C736B] leading-relaxed m-0">
-            {insight.summary}
+          <p className="text-xs text-[#1B2408] leading-relaxed font-medium m-0">
+            {pillars.overallAssessment}
           </p>
         </div>
 
-        {/* Actionable Recommendations */}
+        {/* Actionable Recommendations Checklist */}
         <div className="my-3">
-          <span className="text-xs font-bold text-[#17332B] block mb-2 font-display">
+          <span className="text-xs font-bold text-[#1B2408] block mb-2 font-display uppercase tracking-wider">
             Recommended Action Checklist:
           </span>
-          {actions.length > 0 ? (
-            <ul className="text-xs text-[#17332B] space-y-1.5 pl-4 list-disc font-medium">
-              {actions.map((act, index) => (
-                <li key={index}>{act}</li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-xs text-[#5C736B]">
-              {insight.actionGuidance}
-            </p>
-          )}
+          <ul className="text-xs text-[#1B2408] space-y-2 pl-4 list-disc font-medium">
+            {actionList.map((act, index) => (
+              <li key={index} className="leading-relaxed">{act}</li>
+            ))}
+          </ul>
         </div>
-
-        {/* Possible Contributing Factors (Collapsible) */}
-        {factors.length > 0 && (
-          <details className="border-t border-[#E2EAE6] pt-3 mt-3 text-xs text-[#5C736B] cursor-pointer group">
-            <summary className="font-semibold text-[#17332B] hover:text-[#2F6F5E] transition-colors py-0.5 select-none">
-              Possible environmental factors (Click to inspect)
-            </summary>
-            <ul className="pl-4 mt-2 space-y-1 text-xs list-disc">
-              {factors.map((fac, index) => (
-                <li key={index}>{fac}</li>
-              ))}
-            </ul>
-          </details>
-        )}
       </div>
 
-      <div className="mt-4 pt-3 border-t border-[#E2EAE6]">
-        <p className="text-[11px] text-[#5C736B]/80 leading-relaxed m-0">
-          Rekomendasi bersifat panduan pendukung keputusan budidaya dan disesuaikan dengan pengamatan lapangan aktual.
+      <div className="mt-4 pt-3 border-t border-[#E4EBE0]">
+        <p className="text-[11px] text-[#617253] leading-relaxed m-0">
+          Rekomendasi bersifat pendukung keputusan budidaya berbasis telemetri nyata dan disesuaikan dengan observasi lapangan.
         </p>
       </div>
     </section>

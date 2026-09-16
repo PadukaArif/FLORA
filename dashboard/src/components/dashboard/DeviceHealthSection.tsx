@@ -4,201 +4,209 @@ import { TelemetryRecord, MqttStatus } from '../../types/dashboard';
 interface DeviceHealthSectionProps {
   latest: TelemetryRecord | null;
   mqttStatus?: MqttStatus;
+  wsStatus?: 'connecting' | 'connected' | 'disconnected';
 }
 
-export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({ latest, mqttStatus }) => {
+export const DeviceHealthSection: React.FC<DeviceHealthSectionProps> = ({
+  latest,
+  mqttStatus = 'DISCONNECTED',
+  wsStatus = 'connecting',
+}) => {
   const isOnline = latest?.timestamp
     ? Date.now() - Date.parse(latest.timestamp) < 25000
     : false;
 
-  const mainStatus = isOnline ? 'ONLINE' : 'OFFLINE';
-  const mainMac = latest?.esp32_mac || '—';
+  // 1. ESP32 Main Node
+  const esp32Status = !latest
+    ? wsStatus === 'connecting' ? 'CONNECTING' : 'UNKNOWN'
+    : isOnline ? 'CONNECTED' : 'DISCONNECTED';
+  const esp32Mac = latest?.esp32_mac || 'UNKNOWN';
 
-  const isVisionActive = isOnline && Boolean(latest?.vision_connected);
-  const camStatus = isVisionActive ? 'ESP-NOW ACTIVE' : 'STANDBY / NO SIGNAL';
-  const camMac = latest?.esp32cam_mac || '—';
+  // 2. ESP32-CAM Node
+  const camStatus = !latest
+    ? 'UNKNOWN'
+    : latest.vision_connected && isOnline
+    ? 'CONNECTED'
+    : isOnline
+    ? 'STANDBY / DISCONNECTED'
+    : 'DISCONNECTED';
+  const camMac = latest?.esp32cam_mac || 'UNKNOWN';
 
-  const mqtt = mqttStatus || 'DISCONNECTED';
-  const hasWifiChannel = latest?.wifi_channel !== undefined && latest.wifi_channel !== null;
-  const wifiChannelText = hasWifiChannel ? `CH ${latest!.wifi_channel}` : '—';
+  // 3. MQTT Broker
+  const mqttText = mqttStatus === 'CONNECTED'
+    ? 'CONNECTED'
+    : mqttStatus === 'RECONNECTING'
+    ? 'CONNECTING'
+    : 'DISCONNECTED';
 
-  const dhtStatus = isOnline ? 'STREAMING' : 'NO STREAM';
-  const soilStatus = isOnline ? 'STREAMING' : 'NO STREAM';
-  const l298nStatus = 'NOT REPORTED';
+  // 4. WebSocket Stream
+  const wsText = wsStatus === 'connected'
+    ? 'CONNECTED'
+    : wsStatus === 'connecting'
+    ? 'CONNECTING'
+    : 'DISCONNECTED';
 
-  const hasLeftLimit = latest?.limit_left !== undefined && latest?.limit_left !== null;
-  const hasRightLimit = latest?.limit_right !== undefined && latest?.limit_right !== null;
-  const leftText = latest?.limit_left === true ? 'ACTIVE' : latest?.limit_left === false ? 'CLEAR' : 'UNKNOWN';
-  const rightText = latest?.limit_right === true ? 'ACTIVE' : latest?.limit_right === false ? 'CLEAR' : 'UNKNOWN';
+  // 5. ESP-NOW Link
+  const espNowStatus = !latest
+    ? 'UNKNOWN'
+    : latest.vision_connected && isOnline
+    ? 'ACTIVE'
+    : latest.wifi_channel
+    ? `STANDBY (CH ${latest.wifi_channel})`
+    : 'UNKNOWN';
 
-  const limitSummary =
-    latest?.limit_left === true || latest?.limit_right === true
-      ? 'LIMIT ACTIVE'
-      : !hasLeftLimit && !hasRightLimit
-      ? 'NOT REPORTED'
-      : 'CLEAR';
+  // 6. DHT22
+  const dhtStatus = !latest
+    ? 'UNKNOWN'
+    : isOnline && latest.temperature !== undefined && latest.humidity !== undefined
+    ? 'STREAMING'
+    : isOnline
+    ? 'UNKNOWN'
+    : 'OFFLINE';
 
-  const limitColor =
-    limitSummary === 'LIMIT ACTIVE'
-      ? 'text-[#DC2626]'
-      : limitSummary === 'CLEAR'
-      ? 'text-[#2E7D32]'
-      : 'text-[#5C736B]';
+  // 7. Soil Sensor
+  const soilStatus = !latest
+    ? 'UNKNOWN'
+    : isOnline && latest.soil_moisture !== undefined
+    ? 'STREAMING'
+    : isOnline
+    ? 'UNKNOWN'
+    : 'OFFLINE';
+
+  // 8. Motor / Carriage
+  const motorStatus = 'READY (NO FEEDBACK)';
+
+  // 9. Limit Switches
+  const leftText = latest?.limit_left === true
+    ? 'ACTIVE'
+    : latest?.limit_left === false
+    ? 'CLEAR'
+    : 'UNKNOWN';
+  const rightText = latest?.limit_right === true
+    ? 'ACTIVE'
+    : latest?.limit_right === false
+    ? 'CLEAR'
+    : 'UNKNOWN';
+
+  const getDotClass = (status: string) => {
+    switch (status) {
+      case 'CONNECTED':
+      case 'STREAMING':
+      case 'ACTIVE':
+        return 'bg-[#367C29]';
+      case 'CONNECTING':
+      case 'READY (NO FEEDBACK)':
+        return 'bg-[#D97706]';
+      case 'DISCONNECTED':
+      case 'OFFLINE':
+        return 'bg-[#DC2626]';
+      default:
+        return 'bg-[#617253]';
+    }
+  };
+
+  const devices = [
+    {
+      label: 'ESP32 Main Node',
+      status: esp32Status,
+      detail: `MAC: ${esp32Mac}`,
+    },
+    {
+      label: 'ESP32-CAM Node',
+      status: camStatus,
+      detail: `MAC: ${camMac}`,
+    },
+    {
+      label: 'MQTT Broker',
+      status: mqttText,
+      detail: 'TLS Transport Pipeline',
+    },
+    {
+      label: 'WebSocket Stream',
+      status: wsText,
+      detail: 'Client-Server Live Channel',
+    },
+    {
+      label: 'ESP-NOW Link',
+      status: espNowStatus,
+      detail: 'Inter-Board Wireless Mesh',
+    },
+    {
+      label: 'DHT22 Sensor',
+      status: dhtStatus,
+      detail: 'Temperature & Air Humidity',
+    },
+    {
+      label: 'Soil Moisture Probe',
+      status: soilStatus,
+      detail: 'Simulated in firmware (70%)',
+    },
+    {
+      label: 'Scanner Motor',
+      status: motorStatus,
+      detail: 'Open-loop Carriage Drive',
+    },
+  ];
 
   return (
     <section id="devices" className="mt-8">
       <div className="flex justify-between items-start mb-4">
         <div>
-          <span className="text-[11px] font-semibold text-[#2F6F5E] uppercase tracking-wider block">
-            Hardware &amp; Network Infrastructure
+          <span className="text-[10px] font-bold text-[#597C00] uppercase tracking-widest block">
+            Infrastructure Status
           </span>
-          <h2 className="text-lg font-bold text-[#17332B] font-display">
-            System &amp; Device Topology
+          <h2 className="text-lg font-bold text-[#1B2408] font-display">
+            System &amp; Hardware Health Topology
           </h2>
         </div>
         <span
           className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
-            isOnline && mqtt === 'CONNECTED'
-              ? 'bg-[#E8F5E9] text-[#1B5E20] border-[#C8E6C9]'
-              : 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]'
+            isOnline && mqttStatus === 'CONNECTED'
+              ? 'bg-[#EAF4E8] text-[#22531A] border-[#C4E1BF]'
+              : 'bg-[#FEF7E8] text-[#8A570C] border-[#FDE3B5]'
           }`}
         >
-          {isOnline && mqtt === 'CONNECTED' ? 'Telemetry Stream Active' : 'Degraded Telemetry'}
+          {isOnline && mqttStatus === 'CONNECTED' ? 'Telemetry Stream Active' : 'Degraded Telemetry'}
         </span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        {/* ESP32 Main Core */}
-        <article className="flora-card p-4 rounded-2xl bg-white border border-[#E2EAE6] shadow-xs">
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider">
-              ESP32 Main Node
+        {devices.map((dev) => (
+          <article key={dev.label} className="flora-card p-4 shadow-xs">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-[10px] font-bold text-[#617253] uppercase tracking-wider">
+                {dev.label}
+              </span>
+              <span className={`w-2 h-2 rounded-full ${getDotClass(dev.status)}`} />
+            </div>
+            <span className="text-sm font-bold text-[#1B2408] block font-display">
+              {dev.status}
             </span>
-            <span
-              className={`w-2 h-2 rounded-full ${
-                isOnline ? 'bg-[#2E7D32]' : 'bg-[#DC2626]'
-              }`}
-            />
-          </div>
-          <span className="text-sm font-bold text-[#17332B] block font-display">
-            {mainStatus}
-          </span>
-          <span className="text-[11px] font-mono text-[#5C736B] block mt-1">
-            MAC: {mainMac}
-          </span>
-        </article>
-
-        {/* ESP32-CAM Node */}
-        <article className="flora-card p-4 rounded-2xl bg-white border border-[#E2EAE6] shadow-xs">
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider">
-              ESP32-CAM Node
+            <span className="text-[11px] font-mono text-[#617253] block mt-1 truncate">
+              {dev.detail}
             </span>
-            <span
-              className={`w-2 h-2 rounded-full ${
-                isVisionActive ? 'bg-[#2E7D32]' : 'bg-[#D97706]'
-              }`}
-            />
-          </div>
-          <span className="text-sm font-bold text-[#17332B] block font-display">
-            {camStatus}
-          </span>
-          <span className="text-[11px] font-mono text-[#5C736B] block mt-1">
-            MAC: {camMac}
-          </span>
-        </article>
+          </article>
+        ))}
 
-        {/* MQTT Broker Status */}
-        <article className="flora-card p-4 rounded-2xl bg-white border border-[#E2EAE6] shadow-xs">
+        {/* 9th Card: Limit Switches */}
+        <article className="flora-card p-4 shadow-xs">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider">
-              MQTT Broker
+            <span className="text-[10px] font-bold text-[#617253] uppercase tracking-wider">
+              Limit Switches
             </span>
-            <span
-              className={`w-2 h-2 rounded-full ${
-                mqtt === 'CONNECTED' ? 'bg-[#2E7D32]' : 'bg-[#DC2626]'
-              }`}
-            />
+            <span className={`w-2 h-2 rounded-full ${leftText === 'ACTIVE' || rightText === 'ACTIVE' ? 'bg-[#DC2626]' : 'bg-[#367C29]'}`} />
           </div>
-          <span className="text-sm font-bold text-[#17332B] block font-display">
-            {mqtt}
-          </span>
-          <span className="text-[11px] text-[#5C736B] block mt-1">
-            Broker Transport Pipeline
-          </span>
-        </article>
-
-        {/* WiFi / ESP-NOW Channel */}
-        <article className="flora-card p-4 rounded-2xl bg-white border border-[#E2EAE6] shadow-xs">
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider">
-              WiFi / ESP-NOW
+          <div className="flex items-center gap-2 text-sm font-bold font-display mt-0.5">
+            <span className={leftText === 'ACTIVE' ? 'text-[#DC2626]' : leftText === 'CLEAR' ? 'text-[#22531A]' : 'text-[#617253]'}>
+              L: {leftText}
             </span>
-            <span
-              className={`w-2 h-2 rounded-full ${
-                hasWifiChannel ? 'bg-[#2E7D32]' : 'bg-[#5C736B]'
-              }`}
-            />
+            <span className="text-[#617253]/40">|</span>
+            <span className={rightText === 'ACTIVE' ? 'text-[#DC2626]' : rightText === 'CLEAR' ? 'text-[#22531A]' : 'text-[#617253]'}>
+              R: {rightText}
+            </span>
           </div>
-          <span className="text-sm font-bold text-[#17332B] block font-display font-tabular">
-            Channel: {wifiChannelText}
-          </span>
-          <span className="text-[11px] text-[#5C736B] block mt-1">
-            {hasWifiChannel ? 'Reported via ESP32 telemetry' : 'Awaiting telemetry'}
-          </span>
-        </article>
-
-        {/* DHT22 Sensor */}
-        <article className="flora-card p-4 rounded-2xl bg-white border border-[#E2EAE6] shadow-xs">
-          <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider block mb-1">
-            DHT22 Temp/Humidity
-          </span>
-          <span className="text-sm font-bold text-[#17332B] block font-display">
-            {dhtStatus}
-          </span>
-          <span className="text-[11px] text-[#5C736B] block mt-1">
-            GPIO 4 Sensor Bus
-          </span>
-        </article>
-
-        {/* Soil Moisture ADC */}
-        <article className="flora-card p-4 rounded-2xl bg-white border border-[#E2EAE6] shadow-xs">
-          <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider block mb-1">
-            Soil Moisture Probe
-          </span>
-          <span className="text-sm font-bold text-[#17332B] block font-display">
-            {soilStatus}
-          </span>
-          <span className="text-[11px] text-[#5C736B] block mt-1">
-            Analog ADC Input
-          </span>
-        </article>
-
-        {/* L298N Motor Driver */}
-        <article className="flora-card p-4 rounded-2xl bg-white border border-[#E2EAE6] shadow-xs">
-          <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider block mb-1">
-            L298N H-Bridge Driver
-          </span>
-          <span className="text-sm font-bold text-[#5C736B] block font-display">
-            {l298nStatus}
-          </span>
-          <span className="text-[11px] text-[#5C736B] block mt-1">
-            No hardware telemetry line
-          </span>
-        </article>
-
-        {/* Limit Switches */}
-        <article className="flora-card p-4 rounded-2xl bg-white border border-[#E2EAE6] shadow-xs">
-          <span className="text-[10px] font-semibold text-[#5C736B] uppercase tracking-wider block mb-1">
-            End-Stop Limit Switches
-          </span>
-          <span
-            className={`text-sm font-bold font-display block ${limitColor}`}
-          >
-            {limitSummary}
-          </span>
-          <span className="text-[11px] font-tabular text-[#5C736B] block mt-1">
-            L: {leftText} | R: {rightText}
+          <span className="text-[11px] text-[#617253] block mt-1">
+            Endstop Safety Interlock
           </span>
         </article>
       </div>

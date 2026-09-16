@@ -22,15 +22,15 @@ interface SensorCardProps {
 
 const SensorCard: React.FC<SensorCardProps> = ({ title, icon, metric, updatedText }) => {
   return (
-    <article className="flora-card p-5 lg:p-6 flex flex-col justify-between transition-all duration-200 hover:border-[#8FBEA8] hover:shadow-md bg-white rounded-2xl border border-[#E2EAE6]">
+    <article className="flora-card p-5 lg:p-6 flex flex-col justify-between transition-all duration-200 hover:border-[#9DB312] hover:shadow-md">
       <div>
         {/* Header with Semantic Icon & Status Badge */}
         <div className="flex justify-between items-center mb-3.5">
           <div className="flex items-center gap-2.5">
-            <span className="w-8 h-8 rounded-xl bg-[#F2F6F4] text-[#2F6F5E] flex items-center justify-center font-bold border border-[#E2EAE6] shrink-0 shadow-sm">
+            <span className="w-8 h-8 rounded-xl bg-[#F4F7F2] text-[#597C00] flex items-center justify-center font-bold border border-[#E4EBE0] shrink-0 shadow-xs">
               {icon}
             </span>
-            <span className="text-[11px] font-bold text-[#5C736B] uppercase tracking-wider">
+            <span className="text-[11px] font-bold text-[#617253] uppercase tracking-wider">
               {title}
             </span>
           </div>
@@ -53,26 +53,26 @@ const SensorCard: React.FC<SensorCardProps> = ({ title, icon, metric, updatedTex
 
         {/* Large Value & Unit */}
         <div className="my-2.5 flex items-baseline gap-1.5">
-          <span className="text-3xl lg:text-4xl font-bold font-tabular text-[#17332B] tracking-tight">
+          <span className="text-3xl lg:text-4xl font-bold font-tabular text-[#1B2408] tracking-tight">
             {metric.valueFormatted}
           </span>
-          <span className="text-base font-semibold text-[#5C736B] font-display">
+          <span className="text-base font-semibold text-[#617253] font-display">
             {metric.unit}
           </span>
         </div>
 
-        {/* Short Agronomic Interpretation */}
-        <p className="text-xs text-[#5C736B] leading-relaxed my-2 min-h-[38px]">
+        {/* Human-Readable Agronomic Interpretation */}
+        <p className="text-xs text-[#617253] leading-relaxed my-2 min-h-[38px]">
           {metric.explanation}
         </p>
       </div>
 
-      {/* Reference / Target Range & Timestamp */}
-      <div className="pt-3.5 border-t border-[#E2EAE6] flex justify-between items-center text-[11px] gap-2 flex-wrap">
-        <span className="font-semibold text-[#2F6F5E] bg-[#F2F6F4] px-2.5 py-1 rounded-lg border border-[#E2EAE6] text-[11px]">
+      {/* Target Range Reference & Timestamp */}
+      <div className="pt-3.5 border-t border-[#E4EBE0] flex justify-between items-center text-[11px] gap-2 flex-wrap">
+        <span className="font-semibold text-[#597C00] bg-[#F4F7F2] px-2.5 py-1 rounded-lg border border-[#E4EBE0] text-[11px]">
           {metric.reference}
         </span>
-        <span className="font-tabular text-[10px] text-[#5C736B]">
+        <span className="font-tabular text-[10px] text-[#617253]">
           {updatedText}
         </span>
       </div>
@@ -91,16 +91,16 @@ export const LiveMonitoring: React.FC<LiveMonitoringProps> = ({ latest, config }
     <section id="monitoring" className="mt-8">
       <div className="flex justify-between items-center mb-4">
         <div>
-          <span className="text-[11px] font-semibold text-[#2F6F5E] uppercase tracking-wider block">
-            Telemetry Feed
+          <span className="text-[10px] font-bold text-[#597C00] uppercase tracking-widest block">
+            Telemetry Stream
           </span>
-          <h2 className="text-lg font-bold text-[#17332B] tracking-tight font-display">
+          <h2 className="text-lg font-bold text-[#1B2408] tracking-tight font-display">
             Live Environmental Sensors
           </h2>
         </div>
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#E8F5E9] border border-[#C8E6C9] text-xs font-semibold text-[#1B5E20]">
-          <span className="w-2 h-2 rounded-full bg-[#2E7D32] animate-pulse" />
-          <span>Live Feed</span>
+        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAF4E8] border border-[#C4E1BF] text-xs font-semibold text-[#22531A]">
+          <span className="w-2 h-2 rounded-full bg-[#597C00] animate-pulse" />
+          <span>Live Telemetry</span>
         </div>
       </div>
 
